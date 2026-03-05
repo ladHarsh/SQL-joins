@@ -1,0 +1,322 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ======= BASE STYLES ======= */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background: #0d0520;
+  color: #e0e0ff;
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+/* ======= SCROLLBAR ======= */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #1e0a3c;
+}
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #6c3aed, #ff6bcd);
+  border-radius: 4px;
+}
+
+/* ======= STARFIELD BACKGROUND ======= */
+.starfield {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.star {
+  position: absolute;
+  border-radius: 50%;
+  background: white;
+  animation: starTwinkle var(--duration, 3s) ease-in-out infinite;
+  animation-delay: var(--delay, 0s);
+}
+
+@keyframes starTwinkle {
+  0%, 100% { opacity: 0.2; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+
+/* ======= GLASSMORPHISM CARD ======= */
+.glass-card {
+  background: rgba(30, 10, 60, 0.6);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(108, 58, 237, 0.2);
+  border-radius: 16px;
+}
+
+.glass-card-hover:hover {
+  border-color: rgba(108, 58, 237, 0.5);
+  box-shadow: 0 0 30px rgba(108, 58, 237, 0.15);
+}
+
+/* ======= GRADIENT TEXT ======= */
+.gradient-text {
+  background: linear-gradient(135deg, #c4c4ff, #ff6bcd, #00d4ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gradient-text-warm {
+  background: linear-gradient(135deg, #ff6bcd, #ff9f43, #ffca28);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ======= GLOW BUTTON ======= */
+.glow-btn {
+  position: relative;
+  background: linear-gradient(135deg, #6c3aed, #a855f7);
+  border: none;
+  border-radius: 12px;
+  padding: 14px 32px;
+  color: white;
+  font-weight: 700;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.glow-btn::before {
+  content: '';
+  position: absolute;
+  top: -2px; left: -2px; right: -2px; bottom: -2px;
+  background: linear-gradient(135deg, #6c3aed, #ff6bcd, #00d4ff);
+  border-radius: 14px;
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.glow-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 40px rgba(108, 58, 237, 0.4);
+}
+
+.glow-btn:hover::before {
+  opacity: 1;
+}
+
+/* ======= JOIN TYPE BUTTONS ======= */
+.join-btn {
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  font-family: 'JetBrains Mono', monospace;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.join-btn-inner {
+  background: rgba(0, 212, 255, 0.15);
+  color: #00d4ff;
+  border-color: rgba(0, 212, 255, 0.4);
+}
+.join-btn-inner:hover, .join-btn-inner.active {
+  background: rgba(0, 212, 255, 0.3);
+  box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+  border-color: #00d4ff;
+}
+
+.join-btn-left {
+  background: rgba(0, 255, 157, 0.15);
+  color: #00ff9d;
+  border-color: rgba(0, 255, 157, 0.4);
+}
+.join-btn-left:hover, .join-btn-left.active {
+  background: rgba(0, 255, 157, 0.3);
+  box-shadow: 0 0 20px rgba(0, 255, 157, 0.3);
+  border-color: #00ff9d;
+}
+
+.join-btn-right {
+  background: rgba(255, 107, 205, 0.15);
+  color: #ff6bcd;
+  border-color: rgba(255, 107, 205, 0.4);
+}
+.join-btn-right:hover, .join-btn-right.active {
+  background: rgba(255, 107, 205, 0.3);
+  box-shadow: 0 0 20px rgba(255, 107, 205, 0.3);
+  border-color: #ff6bcd;
+}
+
+.join-btn-full {
+  background: rgba(255, 159, 67, 0.15);
+  color: #ff9f43;
+  border-color: rgba(255, 159, 67, 0.4);
+}
+.join-btn-full:hover, .join-btn-full.active {
+  background: rgba(255, 159, 67, 0.3);
+  box-shadow: 0 0 20px rgba(255, 159, 67, 0.3);
+  border-color: #ff9f43;
+}
+
+/* ======= DATA ROW CARDS ======= */
+.data-row {
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: all 0.3s ease;
+}
+
+.data-row.matched {
+  border: 1px solid rgba(0, 255, 157, 0.5);
+  background: rgba(0, 255, 157, 0.08);
+}
+
+.data-row.unmatched {
+  border: 1px solid rgba(255, 71, 87, 0.3);
+  background: rgba(255, 71, 87, 0.05);
+  opacity: 0.5;
+}
+
+.data-row.null-fill {
+  border: 1px dashed rgba(255, 159, 67, 0.4);
+  background: rgba(255, 159, 67, 0.05);
+}
+
+/* ======= QUIZ STYLES ======= */
+.quiz-option {
+  padding: 14px 20px;
+  border-radius: 12px;
+  background: rgba(30, 10, 60, 0.5);
+  border: 2px solid rgba(108, 58, 237, 0.2);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+.quiz-option:hover {
+  border-color: rgba(108, 58, 237, 0.6);
+  background: rgba(108, 58, 237, 0.1);
+  transform: translateX(4px);
+}
+
+.quiz-option.correct {
+  border-color: #00ff9d;
+  background: rgba(0, 255, 157, 0.15);
+}
+
+.quiz-option.incorrect {
+  border-color: #ff4757;
+  background: rgba(255, 71, 87, 0.15);
+}
+
+/* ======= NAVIGATION ======= */
+.nav-link {
+  position: relative;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 0.9rem;
+  color: #9999ff;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.nav-link:hover {
+  color: #fff;
+  background: rgba(108, 58, 237, 0.15);
+}
+
+.nav-link.active {
+  color: #fff;
+  background: rgba(108, 58, 237, 0.25);
+}
+
+/* ======= SECTION HEADING ======= */
+.section-heading {
+  font-family: 'Outfit', system-ui, sans-serif;
+  font-weight: 800;
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  line-height: 1.2;
+}
+
+/* ======= PERCENTAGE BAR ======= */
+.percentage-bar {
+  height: 28px;
+  border-radius: 14px;
+  background: rgba(30, 10, 60, 0.6);
+  overflow: hidden;
+  position: relative;
+}
+
+.percentage-fill {
+  height: 100%;
+  border-radius: 14px;
+  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  padding-left: 12px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: white;
+  min-width: fit-content;
+}
+
+/* ======= MOBILE RESPONSIVE ======= */
+@media (max-width: 768px) {
+  .join-btn {
+    padding: 8px 14px;
+    font-size: 0.75rem;
+  }
+  .data-row {
+    font-size: 0.75rem;
+    padding: 8px 12px;
+  }
+}
+
+/* ======= PULSE RING ANIMATION ======= */
+@keyframes pulseRing {
+  0% { transform: scale(0.8); opacity: 1; }
+  100% { transform: scale(2); opacity: 0; }
+}
+
+.pulse-ring {
+  animation: pulseRing 1.5s ease-out infinite;
+}
+
+/* ======= CONFETTI ======= */
+@keyframes confettiFall {
+  0% { transform: translateY(-100vh) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+}
+
+.confetti {
+  position: fixed;
+  top: 0;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  animation: confettiFall var(--duration, 3s) ease-in forwards;
+  animation-delay: var(--delay, 0s);
+  z-index: 100;
+  pointer-events: none;
+}
