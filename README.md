@@ -1,113 +1,98 @@
-# SQL JOIN Universe 🌌
+# 🌌 JOIN UNIVERSE
 
-> **Where Tables Discover Their Relationships**  
-> An interactive, gamified web experience for learning SQL JOINs — built for live classroom presentations.
-
-![Landing Page](./screenshots/landing.png)
+> **Where Tables Discover Their Relationships**
+> An interactive, gamified SQL JOIN learning experience built for live classroom presentations with 200+ Gen-Z interns.
 
 ## 🚀 Features
 
-### 🔬 Interactive JOIN Visualizer
-- Two animated data tables (Students & Courses, Heroes & Sidekicks)
-- Click INNER, LEFT, RIGHT, or FULL JOIN buttons
-- Watch rows animate: match (✓), exclude (✗), or fill with NULL
-- Result table shows exactly what each JOIN produces
-- Toggle SQL syntax view
+### 🔬 JOIN Visualizer Simulator
+- **TMKOC themed dataset** — Residents (Jethalal, Daya, Taarak, Bhide, Popatlal, Sodhi, Iyer) × Professions
+- Supports **7 JOIN types**: INNER, LEFT, RIGHT, FULL OUTER, CROSS, SELF, NATURAL
+- Animated row highlighting — matches (✓), exclusions (✗), NULL fills
+- Result table with match/NULL/cross stats
+- SQL syntax toggle for each JOIN
+- Real-life analogy explanation per JOIN type
 
-### ⚔️ Join Battle Quiz
-- 8 interactive quiz questions about SQL JOINs
-- Instant feedback with explanations
+### 🧭 JOIN Decision Helper
+- Interactive flowchart that asks questions about your data needs
+- Recommends the correct JOIN type with explanation
+- Visual progress tracking with back navigation
+
+### ⚔️ JOIN Challenge (Quiz)
+- 10 scenario-based questions with TMKOC & Gen-Z contexts
 - Simulated live class response percentages
-- Confetti animations on correct answers! 🎊
+- Confetti on correct answers 🎊
 - Score tracking with fun completion messages
 
-### 😂 Real-Life JOINs
-- 6 humorous real-world analogies for each JOIN type
-- Dating App (INNER JOIN), Group Project (LEFT JOIN), etc.
-- Expandable cards with meme-style quotes
-- Color-coded by JOIN type
+### 📋 Visual Cheat Sheet
+- Animated cards for all 7 JOIN types + UNION vs JOIN
+- Quick Memory Hack grid
+- Screenshot-friendly design
 
-### 🤖 Ask AI
-- Chat interface for SQL JOIN questions
-- Supports Gemini API (optional)
-- Built-in fallback knowledge base works offline
+### 🤖 Ask JOIN Guru (AI Chat)
+- Chat interface powered by **Gemini API** via secure serverless function
+- Built-in fallback knowledge base works **100% offline**
 - Suggested quick questions
 
 ## 🛠 Tech Stack
 
 | Tech | Purpose |
 |------|---------|
-| **React 19** | UI framework |
-| **Vite 5** | Build tool & dev server |
-| **Tailwind CSS 3** | Utility-first styling |
-| **Framer Motion** | Smooth animations |
-| **Gemini API** | AI explanations (optional) |
+| **React 19** | UI Framework |
+| **Vite 5** | Build Tool |
+| **Tailwind CSS 3** | Styling |
+| **Framer Motion** | Animations |
+| **Gemini API** | AI Chat (serverless) |
+| **Vercel** | Deployment + Serverless |
 
 ## 📦 Getting Started
 
 ```bash
-# Install dependencies
 npm install
-
-# Start development server
-npm run dev
-
-# Build for production
-npm run build
-
-# Preview production build
-npm run preview
+npm run dev        # → http://localhost:5173/
+npm run build      # Production build
 ```
 
 ## 🌐 Deploy to Vercel
 
-1. Push to GitHub
-2. Import in [Vercel](https://vercel.com)
-3. Vercel auto-detects Vite — just deploy!
-
-Or use the CLI:
 ```bash
+# Add Gemini API key as environment variable in Vercel dashboard:
+# GEMINI_API_KEY=your_key_here
+
 npx vercel --prod
 ```
 
-## 📁 Project Structure
+Or push to GitHub → Import at [vercel.com/new](https://vercel.com/new)
+
+The AI chat works without the API key using the built-in knowledge base.
+
+## 📁 Structure
 
 ```
 sql/
-├── public/
-│   └── vite.svg              # Favicon
+├── api/
+│   └── ask-ai.js              # Vercel serverless – Gemini proxy
 ├── src/
 │   ├── components/
-│   │   ├── AskAI.jsx         # AI chat with Gemini integration
-│   │   ├── Footer.jsx        # Animated footer
-│   │   ├── JoinBattle.jsx    # Quiz mode
-│   │   ├── JoinVisualizer.jsx # Core JOIN visualizer
-│   │   ├── LandingHero.jsx   # Landing screen
-│   │   ├── Navbar.jsx        # Navigation bar
-│   │   ├── RealLifeJoins.jsx # Humorous examples
-│   │   └── Starfield.jsx     # Background animation
+│   │   ├── AskAI.jsx           # AI chat + fallback
+│   │   ├── CheatSheet.jsx      # Visual cheat sheet
+│   │   ├── DecisionHelper.jsx  # JOIN decision wizard
+│   │   ├── Footer.jsx
+│   │   ├── JoinChallenge.jsx   # Quiz mode
+│   │   ├── JoinVisualizer.jsx  # Core visualizer (7 types)
+│   │   ├── LandingHero.jsx
+│   │   ├── Navbar.jsx
+│   │   └── Starfield.jsx
 │   ├── data/
-│   │   └── datasets.js       # All data, questions, examples
+│   │   └── datasets.js         # TMKOC data, questions, cheat sheet
 │   ├── utils/
-│   │   └── joinEngine.js     # INNER/LEFT/RIGHT/FULL JOIN logic
-│   ├── App.jsx               # Main app orchestrator
-│   ├── index.css             # Global styles & design system
-│   └── main.jsx              # Entry point
-├── index.html
-├── package.json
-├── tailwind.config.js
-├── postcss.config.js
-├── vite.config.js
-└── vercel.json
+│   │   └── joinEngine.js       # All 7 JOIN algorithms
+│   ├── App.jsx
+│   ├── index.css
+│   └── main.jsx
+├── vercel.json
+└── package.json
 ```
-
-## 🎯 Design Philosophy
-
-- **No databases** — All data is JSON in the frontend
-- **No heavy backend** — Pure static site via CDN
-- **Mobile responsive** — Works on phones for 200+ concurrent users
-- **Presentation-ready** — Bold headings, clear animations, dark cosmic theme
-- **Graceful degradation** — AI features work without API key
 
 ## 📄 License
 

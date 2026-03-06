@@ -1,475 +1,239 @@
 import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { datasets, joinDescriptions } from "../data/datasets";
+import { residents, professions, friendships, events, studentRecords, gradeInfo, joinDescriptions } from "../data/datasets";
 import { executeJoin } from "../utils/joinEngine";
 
-// ======= INTERACTIVE JOIN VISUALIZER =======
-const joinTypes = ["INNER", "LEFT", "RIGHT", "FULL"];
-const datasetKeys = ["students", "heroes"];
+const TYPES = ["INNER", "LEFT", "RIGHT", "FULL", "CROSS", "SELF", "NATURAL"];
 
 export default function JoinVisualizer() {
-  const [activeJoin, setActiveJoin] = useState(null);
-  const [datasetKey, setDatasetKey] = useState("students");
+  const [active, setActive] = useState(null);
   const [showSQL, setShowSQL] = useState(false);
 
-  const dataset = datasets[datasetKey];
-  const { leftTable, rightTable, joinKey } = dataset;
+  const config = {
+    left: residents, right: professions,
+    lKey: "id", rKey: "resident_id",
+    crossLeft: residents.slice(0, 4), crossRight: events,
+    selfTable: residents, friendships,
+    natLeft: studentRecords, natRight: gradeInfo,
+  };
 
-  const joinResult = useMemo(() => {
-    if (!activeJoin) return null;
-    return executeJoin(
-      activeJoin,
-      leftTable.data,
-      rightTable.data,
-      joinKey.left,
-      joinKey.right
-    );
-  }, [activeJoin, datasetKey]);
+  const result = useMemo(() => active ? executeJoin(active, config) : null, [active]);
+  const info = active ? joinDescriptions[active] : null;
 
-  const joinInfo = activeJoin ? joinDescriptions[activeJoin] : null;
-
-  // Get IDs that are matched in the current join
+  // Determine which rows are in the join result
   const matchedLeftIds = useMemo(() => {
-    if (!joinResult) return new Set();
-    return new Set(joinResult.filter((r) => r.left).map((r) => r.left.id));
-  }, [joinResult]);
-
+    if (!result) return new Set();
+    return new Set(result.filter(r => r.left).map(r => r.left.id));
+  }, [result]);
   const matchedRightIds = useMemo(() => {
-    if (!joinResult) return new Set();
-    return new Set(
-      joinResult.filter((r) => r.right).map((r) => r.right.id)
-    );
-  }, [joinResult]);
+    if (!result) return new Set();
+    return new Set(result.filter(r => r.right).map(r => r.right.id));
+  }, [result]);
+
+  // Decide which source tables to show based on join type
+  const showStandard = !active || ["INNER", "LEFT", "RIGHT", "FULL"].includes(active);
+  const isCross = active === "CROSS";
+  const isSelf = active === "SELF";
+  const isNatural = active === "NATURAL";
+
+  const leftData  = isCross ? residents.slice(0, 4) : isNatural ? studentRecords : isSelf ? residents : residents;
+  const rightData = isCross ? events : isNatural ? gradeInfo : isSelf ? residents : professions;
+  const leftName  = isCross ? "Residents (sample)" : isNatural ? "Student Records" : isSelf ? "Residents (A)" : "Residents";
+  const rightName = isCross ? "Events" : isNatural ? "Grade Info" : isSelf ? "Residents (B)" : "Professions";
+  const leftFields  = isCross ? ["name","emoji"] : isNatural ? ["student_name","score"] : ["name","emoji","flat"];
+  const rightFields = isCross ? ["event"] : isNatural ? ["grade","teacher"] : isSelf ? ["name","emoji","flat"] : ["profession","icon"];
+  const leftKeyField = isCross || isSelf ? null : isNatural ? null : "id";
+  const rightKeyField = isCross || isSelf ? null : isNatural ? null : "resident_id";
 
   return (
-    <section id="visualizer" className="py-20 px-4 relative">
+    <section id="visualizer" className="py-16 px-4">
       <div className="max-w-7xl mx-auto">
-        {/* Section Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-12"
-        >
-          <h2 className="section-heading gradient-text mb-3">
-            🔬 Interactive JOIN Visualizer
-          </h2>
-          <p className="text-cosmos-300 text-lg max-w-2xl mx-auto">
-            Click a JOIN type to see how rows merge, vanish, or fill with NULLs.
-            Watch the magic happen!
+        {/* Header */}
+        <motion.div initial={{ opacity: 0, y: 18 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
+          className="text-center mb-10">
+          <h2 className="sec-head grad-text mb-2">🔬 JOIN Visualizer Simulator</h2>
+          <p className="text-slate-400 text-sm sm:text-base max-w-2xl mx-auto">
+            Gokuldham Society dataset 🏘️ — Click any JOIN to see rows animate, merge, vanish, or fill with NULLs!
           </p>
         </motion.div>
 
-        {/* Dataset Switcher */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="flex justify-center gap-3 mb-8"
-        >
-          {datasetKeys.map((key) => (
-            <motion.button
-              key={key}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => {
-                setDatasetKey(key);
-                setActiveJoin(null);
-              }}
-              className={`px-5 py-2.5 rounded-xl font-semibold text-sm transition-all ${
-                datasetKey === key
-                  ? "glass-card border-cosmos-400 text-white shadow-lg shadow-cosmos-500/20"
-                  : "glass-card border-transparent text-cosmos-400 hover:text-white"
-              }`}
-              style={
-                datasetKey === key
-                  ? { borderColor: "rgba(108, 58, 237, 0.6)" }
-                  : {}
-              }
-            >
-              {key === "students" ? "👩‍🎓 Students & Courses" : "🦸 Heroes & Sidekicks"}
+        {/* JOIN type buttons */}
+        <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }}
+          className="flex flex-wrap justify-center gap-2 mb-8">
+          {TYPES.map(t => (
+            <motion.button key={t} whileHover={{ scale: 1.06 }} whileTap={{ scale: .94 }}
+              onClick={() => setActive(active === t ? null : t)}
+              className={`jbtn ${active === t ? "active" : ""}`} data-type={t}>
+              {joinDescriptions[t].icon} {joinDescriptions[t].name}
             </motion.button>
           ))}
         </motion.div>
 
-        {/* JOIN Type Buttons */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.2 }}
-          className="flex flex-wrap justify-center gap-3 mb-10"
-        >
-          {joinTypes.map((type) => (
-            <motion.button
-              key={type}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => setActiveJoin(activeJoin === type ? null : type)}
-              className={`join-btn join-btn-${type.toLowerCase()} ${
-                activeJoin === type ? "active" : ""
-              }`}
-              id={`join-btn-${type.toLowerCase()}`}
-            >
-              {joinDescriptions[type].icon} {joinDescriptions[type].name}
-            </motion.button>
-          ))}
-        </motion.div>
-
-        {/* JOIN Description Card */}
+        {/* Join info card */}
         <AnimatePresence mode="wait">
-          {joinInfo && (
-            <motion.div
-              key={activeJoin}
-              initial={{ opacity: 0, y: 10, scale: 0.98 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -10, scale: 0.98 }}
-              transition={{ duration: 0.3 }}
-              className="glass-card p-5 mb-8 max-w-3xl mx-auto"
-            >
-              <div className="flex items-start gap-4 flex-wrap">
-                <span className="text-3xl">{joinInfo.icon}</span>
+          {info && (
+            <motion.div key={active} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }} className="glass p-4 sm:p-5 mb-8 max-w-3xl mx-auto">
+              <div className="flex items-start gap-3 flex-wrap">
+                <span className="text-3xl">{info.icon}</span>
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-display font-bold text-xl mb-1" style={{ color: joinInfo.color }}>
-                    {joinInfo.name}
+                  <h3 className="font-['Outfit'] font-extrabold text-lg" style={{ color: info.color }}>
+                    {info.name} <span className="text-xs text-slate-500 font-normal ml-1">— {info.tagline}</span>
                   </h3>
-                  <p className="text-cosmos-300 text-sm mb-2">{joinInfo.shortDesc}</p>
-                  <p className="text-cosmos-400 text-xs italic">💡 {joinInfo.analogy}</p>
+                  <p className="text-slate-300 text-sm mt-1">{info.shortDesc}</p>
+                  <p className="text-slate-500 text-xs mt-2 italic">🏘️ {info.realLife}</p>
+                  <p className="mt-2 text-xs font-bold" style={{ color: info.color }}>💡 Rule: {info.rule}</p>
                 </div>
-                <button
-                  onClick={() => setShowSQL(!showSQL)}
-                  className="px-3 py-1.5 rounded-lg text-xs font-mono glass-card text-cosmos-300 hover:text-white transition-colors"
-                >
+                <button onClick={() => setShowSQL(!showSQL)}
+                  className="px-3 py-1 rounded-lg text-xs font-mono glass text-slate-400 hover:text-white transition-colors flex-shrink-0">
                   {showSQL ? "Hide" : "Show"} SQL
                 </button>
               </div>
               <AnimatePresence>
                 {showSQL && (
-                  <motion.div
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: "auto", opacity: 1 }}
+                  <motion.pre initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }}
                     exit={{ height: 0, opacity: 0 }}
-                    className="mt-3 overflow-hidden"
-                  >
-                    <pre className="bg-cosmos-950 rounded-lg p-3 text-xs sm:text-sm font-mono text-nebula-blue overflow-x-auto">
-                      {joinInfo.sql}
-                    </pre>
-                  </motion.div>
+                    className="mt-3 bg-[#020617] rounded-lg p-3 text-xs font-mono text-cyan-300 overflow-x-auto">
+                    {info.sql}
+                  </motion.pre>
                 )}
               </AnimatePresence>
             </motion.div>
           )}
         </AnimatePresence>
 
-        {/* Tables Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-10">
+        {/* Source Tables */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-8">
           {/* Left Table */}
-          <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            className="glass-card p-5 rounded-2xl"
-          >
-            <div className="flex items-center gap-2 mb-4">
-              <div
-                className="w-3 h-3 rounded-full"
-                style={{ background: "#00ff9d" }}
-              />
-              <h3 className="font-display font-bold text-lg text-white">
-                {leftTable.name}
-              </h3>
-              <span className="text-xs text-cosmos-400 font-mono ml-auto">
-                LEFT TABLE
-              </span>
+          <motion.div initial={{ opacity: 0, x: -25 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}
+            className="glass p-4 rounded-2xl">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-2.5 h-2.5 rounded-full bg-green-400" />
+              <h3 className="font-['Outfit'] font-bold text-sm text-white">{leftName}</h3>
+              <span className="text-[.65rem] text-slate-500 font-mono ml-auto">LEFT TABLE</span>
             </div>
-
-            {/* Table Header */}
-            <div className="grid gap-1 mb-2">
-              <div className="flex gap-3 px-4 py-2 text-xs font-mono text-cosmos-400 uppercase tracking-wider">
-                <span className="w-8">ID</span>
-                {leftTable.displayFields.map((f) => (
-                  <span key={f} className="flex-1">{f}</span>
-                ))}
-              </div>
+            <div className="flex gap-2 px-3 py-1.5 text-[.6rem] font-mono text-slate-500 uppercase tracking-wider">
+              {!isCross && !isSelf && !isNatural && <span className="w-6">ID</span>}
+              {leftFields.map(f => <span key={f} className="flex-1">{f}</span>)}
             </div>
-
-            {/* Table Rows */}
-            <div className="space-y-2">
-              <AnimatePresence>
-                {leftTable.data.map((row, i) => {
-                  const isMatched = !activeJoin || matchedLeftIds.has(row.id);
-                  const isExcluded =
-                    activeJoin &&
-                    (activeJoin === "INNER" || activeJoin === "RIGHT") &&
-                    !matchedLeftIds.has(row.id);
-
-                  return (
-                    <motion.div
-                      key={row.id}
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{
-                        opacity: isExcluded ? 0.3 : 1,
-                        x: 0,
-                        scale: isExcluded ? 0.95 : 1,
-                      }}
-                      transition={{ duration: 0.4, delay: i * 0.08 }}
-                      className={`data-row ${
-                        activeJoin
-                          ? isMatched
-                            ? "matched"
-                            : "unmatched"
-                          : "glass-card"
-                      }`}
-                    >
-                      <span className="w-8 font-bold text-cosmos-400">
-                        {row.id}
-                      </span>
-                      {leftTable.displayFields.map((field) => (
-                        <span key={field} className="flex-1 text-white">
-                          {row[field]}
-                        </span>
-                      ))}
-                      {activeJoin && isMatched && !isExcluded && (
-                        <motion.span
-                          initial={{ scale: 0 }}
-                          animate={{ scale: 1 }}
-                          className="text-green-400 text-sm"
-                        >
-                          ✓
-                        </motion.span>
-                      )}
-                      {isExcluded && (
-                        <motion.span
-                          initial={{ scale: 0 }}
-                          animate={{ scale: 1 }}
-                          className="text-red-400 text-sm"
-                        >
-                          ✗
-                        </motion.span>
-                      )}
-                    </motion.div>
-                  );
-                })}
-              </AnimatePresence>
+            <div className="space-y-1.5 mt-1">
+              {leftData.map((row, i) => {
+                const isExcluded = active && (active === "INNER" || active === "RIGHT") && !matchedLeftIds.has(row.id);
+                const isMatch = active && matchedLeftIds.has(row.id);
+                return (
+                  <motion.div key={row.id || i} initial={{ opacity: 0, x: -15 }}
+                    animate={{ opacity: isExcluded ? .3 : 1, x: 0, scale: isExcluded ? .96 : 1 }}
+                    transition={{ duration: .35, delay: i * .06 }}
+                    className={`drow ${active ? (isExcluded ? "excluded" : isMatch ? "matched" : "glass") : "glass"}`}>
+                    {!isCross && !isSelf && !isNatural && <span className="w-6 font-bold text-slate-500 text-xs">{row.id}</span>}
+                    {leftFields.map(f => <span key={f} className="flex-1 text-white text-xs">{row[f]}</span>)}
+                    {active && !isExcluded && isMatch && <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }} className="text-green-400 text-xs">✓</motion.span>}
+                    {isExcluded && <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }} className="text-red-400 text-xs">✗</motion.span>}
+                  </motion.div>
+                );
+              })}
             </div>
           </motion.div>
 
           {/* Right Table */}
-          <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            className="glass-card p-5 rounded-2xl"
-          >
-            <div className="flex items-center gap-2 mb-4">
-              <div
-                className="w-3 h-3 rounded-full"
-                style={{ background: "#ff6bcd" }}
-              />
-              <h3 className="font-display font-bold text-lg text-white">
-                {rightTable.name}
-              </h3>
-              <span className="text-xs text-cosmos-400 font-mono ml-auto">
-                RIGHT TABLE
-              </span>
+          <motion.div initial={{ opacity: 0, x: 25 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}
+            className="glass p-4 rounded-2xl">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-2.5 h-2.5 rounded-full bg-pink-400" />
+              <h3 className="font-['Outfit'] font-bold text-sm text-white">{rightName}</h3>
+              <span className="text-[.65rem] text-slate-500 font-mono ml-auto">RIGHT TABLE</span>
             </div>
-
-            {/* Table Header */}
-            <div className="grid gap-1 mb-2">
-              <div className="flex gap-3 px-4 py-2 text-xs font-mono text-cosmos-400 uppercase tracking-wider">
-                <span className="w-8">FK</span>
-                {rightTable.displayFields.map((f) => (
-                  <span key={f} className="flex-1">{f}</span>
-                ))}
-              </div>
+            <div className="flex gap-2 px-3 py-1.5 text-[.6rem] font-mono text-slate-500 uppercase tracking-wider">
+              {rightKeyField && <span className="w-6">FK</span>}
+              {rightFields.map(f => <span key={f} className="flex-1">{f}</span>)}
             </div>
-
-            {/* Table Rows */}
-            <div className="space-y-2">
-              <AnimatePresence>
-                {rightTable.data.map((row, i) => {
-                  const isMatched = !activeJoin || matchedRightIds.has(row.id);
-                  const isExcluded =
-                    activeJoin &&
-                    (activeJoin === "INNER" || activeJoin === "LEFT") &&
-                    !matchedRightIds.has(row.id);
-
-                  return (
-                    <motion.div
-                      key={row.id}
-                      initial={{ opacity: 0, x: 20 }}
-                      animate={{
-                        opacity: isExcluded ? 0.3 : 1,
-                        x: 0,
-                        scale: isExcluded ? 0.95 : 1,
-                      }}
-                      transition={{ duration: 0.4, delay: i * 0.08 }}
-                      className={`data-row ${
-                        activeJoin
-                          ? isMatched
-                            ? "matched"
-                            : "unmatched"
-                          : "glass-card"
-                      }`}
-                    >
-                      <span className="w-8 font-bold text-cosmos-400">
-                        {row[rightTable.key]}
-                      </span>
-                      {rightTable.displayFields.map((field) => (
-                        <span key={field} className="flex-1 text-white">
-                          {row[field]}
-                        </span>
-                      ))}
-                      {activeJoin && isMatched && !isExcluded && (
-                        <motion.span
-                          initial={{ scale: 0 }}
-                          animate={{ scale: 1 }}
-                          className="text-green-400 text-sm"
-                        >
-                          ✓
-                        </motion.span>
-                      )}
-                      {isExcluded && (
-                        <motion.span
-                          initial={{ scale: 0 }}
-                          animate={{ scale: 1 }}
-                          className="text-red-400 text-sm"
-                        >
-                          ✗
-                        </motion.span>
-                      )}
-                    </motion.div>
-                  );
-                })}
-              </AnimatePresence>
+            <div className="space-y-1.5 mt-1">
+              {rightData.map((row, i) => {
+                const rId = row.id || i;
+                const isExcluded = active && (active === "INNER" || active === "LEFT") && !matchedRightIds.has(row.id);
+                const isMatch = active && matchedRightIds.has(row.id);
+                return (
+                  <motion.div key={rId} initial={{ opacity: 0, x: 15 }}
+                    animate={{ opacity: isExcluded ? .3 : 1, x: 0, scale: isExcluded ? .96 : 1 }}
+                    transition={{ duration: .35, delay: i * .06 }}
+                    className={`drow ${active ? (isExcluded ? "excluded" : isMatch ? "matched" : "glass") : "glass"}`}>
+                    {rightKeyField && <span className="w-6 font-bold text-slate-500 text-xs">{row[rightKeyField]}</span>}
+                    {rightFields.map(f => <span key={f} className="flex-1 text-white text-xs">{row[f]}</span>)}
+                    {active && !isExcluded && isMatch && <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }} className="text-green-400 text-xs">✓</motion.span>}
+                    {isExcluded && <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }} className="text-red-400 text-xs">✗</motion.span>}
+                  </motion.div>
+                );
+              })}
             </div>
           </motion.div>
         </div>
 
-        {/* JOIN Result Table */}
+        {/* Result Table */}
         <AnimatePresence>
-          {joinResult && joinResult.length > 0 && (
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 30 }}
-              transition={{ duration: 0.5 }}
-              className="glass-card p-6 rounded-2xl"
-            >
-              <div className="flex items-center gap-3 mb-5">
-                <motion.div
-                  animate={{ rotate: [0, 360] }}
-                  transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                  className="text-2xl"
-                >
-                  ⚡
-                </motion.div>
-                <h3 className="font-display font-bold text-xl text-white">
-                  Result Table
-                </h3>
-                <span
-                  className="ml-auto px-3 py-1 rounded-full text-xs font-bold"
-                  style={{
-                    background: `${joinInfo?.color}20`,
-                    color: joinInfo?.color,
-                  }}
-                >
-                  {joinResult.length} rows
+          {result && result.length > 0 && (
+            <motion.div initial={{ opacity: 0, y: 25 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 25 }}
+              className="glass p-5 rounded-2xl">
+              <div className="flex items-center gap-3 mb-4">
+                <motion.span animate={{ rotate: [0,360] }} transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                  className="text-xl">⚡</motion.span>
+                <h3 className="font-['Outfit'] font-bold text-base text-white">Result Table</h3>
+                <span className="ml-auto px-2.5 py-1 rounded-full text-xs font-bold"
+                  style={{ background: `${info?.color}18`, color: info?.color }}>
+                  {result.length} row{result.length !== 1 ? "s" : ""}
                 </span>
               </div>
 
-              {/* Result Header */}
-              <div className="flex gap-3 px-4 py-2 text-xs font-mono text-cosmos-400 uppercase tracking-wider border-b border-cosmos-800 mb-2">
-                <span className="flex-1">← {leftTable.name}</span>
-                <span className="w-16 text-center">Match</span>
-                <span className="flex-1 text-right">{rightTable.name} →</span>
+              {/* Result header */}
+              <div className="flex gap-2 px-3 py-1.5 text-[.6rem] font-mono text-slate-500 uppercase tracking-wider border-b border-slate-800 mb-1.5">
+                <span className="flex-1">← {leftName}</span>
+                <span className="w-10 text-center">⟷</span>
+                <span className="flex-1 text-right">{rightName} →</span>
               </div>
 
-              {/* Result Rows */}
-              <div className="space-y-2">
-                {joinResult.map((row, i) => (
-                  <motion.div
-                    key={i}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: i * 0.06, duration: 0.4 }}
-                    className={`data-row ${row.type}`}
-                  >
-                    {/* Left side */}
-                    <div className="flex-1 flex gap-2 items-center">
-                      {row.left ? (
-                        leftTable.displayFields.map((f) => (
-                          <span key={f} className="text-white text-xs sm:text-sm">
-                            {row.left[f]}
-                          </span>
-                        ))
-                      ) : (
-                        <span className="text-nebula-orange text-xs font-mono italic">
-                          NULL
-                        </span>
-                      )}
+              <div className="space-y-1.5 max-h-[350px] overflow-y-auto pr-1">
+                {result.map((row, i) => (
+                  <motion.div key={i} initial={{ opacity: 0, x: -15 }} animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: i * .04, duration: .3 }}
+                    className={`drow ${row.type}`}>
+                    <div className="flex-1 flex gap-1.5 items-center flex-wrap">
+                      {row.left ? leftFields.map(f => (
+                        <span key={f} className="text-white text-[.72rem]">{row.left[f]}</span>
+                      )) : <span className="text-amber-400 text-[.7rem] font-mono italic">NULL</span>}
                     </div>
-
-                    {/* Match indicator */}
-                    <div className="w-16 flex justify-center">
+                    <div className="w-10 flex justify-center">
                       {row.type === "matched" ? (
-                        <motion.span
-                          initial={{ scale: 0 }}
-                          animate={{ scale: 1 }}
-                          className="w-8 h-8 rounded-full flex items-center justify-center text-sm"
-                          style={{ background: "rgba(0, 255, 157, 0.15)" }}
-                        >
-                          🔗
-                        </motion.span>
+                        <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }}
+                          className="w-6 h-6 rounded-full flex items-center justify-center text-[.65rem]"
+                          style={{ background: "rgba(34,197,94,.12)" }}>🔗</motion.span>
+                      ) : row.type === "self-ref" ? (
+                        <motion.span initial={{ scale: 0 }} animate={{ scale: [0,1.3,1] }}
+                          className="w-6 h-6 rounded-full flex items-center justify-center text-[.65rem]"
+                          style={{ background: "rgba(244,63,94,.12)" }}>🪞</motion.span>
+                      ) : row.type === "cross" ? (
+                        <span className="text-[.6rem] text-violet-400">×</span>
                       ) : (
-                        <motion.span
-                          initial={{ scale: 0 }}
-                          animate={{ scale: [0, 1.2, 1] }}
-                          className="w-8 h-8 rounded-full flex items-center justify-center text-sm"
-                          style={{ background: "rgba(255, 159, 67, 0.15)" }}
-                        >
-                          ∅
-                        </motion.span>
+                        <motion.span initial={{ scale: 0 }} animate={{ scale: [0,1.2,1] }}
+                          className="w-6 h-6 rounded-full flex items-center justify-center text-[.6rem]"
+                          style={{ background: "rgba(245,158,11,.1)" }}>∅</motion.span>
                       )}
                     </div>
-
-                    {/* Right side */}
-                    <div className="flex-1 flex gap-2 items-center justify-end text-right">
-                      {row.right ? (
-                        rightTable.displayFields.map((f) => (
-                          <span key={f} className="text-white text-xs sm:text-sm">
-                            {row.right[f]}
-                          </span>
-                        ))
-                      ) : (
-                        <span className="text-nebula-orange text-xs font-mono italic">
-                          NULL
-                        </span>
+                    <div className="flex-1 flex gap-1.5 items-center justify-end flex-wrap text-right">
+                      {row.right ? rightFields.map(f => (
+                        <span key={f} className="text-white text-[.72rem]">{row.right[f]}</span>
+                      )) : <span className="text-amber-400 text-[.7rem] font-mono italic">NULL</span>}
+                      {row.right?.label && (
+                        <span className="text-[.6rem] text-slate-500 ml-1">({row.right.label})</span>
                       )}
                     </div>
                   </motion.div>
                 ))}
               </div>
 
-              {/* Stats Footer */}
-              <div className="flex justify-center gap-6 mt-5 text-xs text-cosmos-400">
-                <span>
-                  ✅ Matched:{" "}
-                  <strong className="text-green-400">
-                    {joinResult.filter((r) => r.type === "matched").length}
-                  </strong>
-                </span>
-                <span>
-                  ∅ NULL-filled:{" "}
-                  <strong className="text-nebula-orange">
-                    {joinResult.filter((r) => r.type === "null-fill").length}
-                  </strong>
-                </span>
-                <span>
-                  📊 Total:{" "}
-                  <strong className="text-white">{joinResult.length}</strong>
-                </span>
+              <div className="flex justify-center gap-5 mt-4 text-[.65rem] text-slate-500">
+                <span>✅ Matched: <strong className="text-green-400">{result.filter(r => r.type === "matched").length}</strong></span>
+                <span>∅ NULL: <strong className="text-amber-400">{result.filter(r => r.type === "null-fill").length}</strong></span>
+                {result.some(r => r.type === "cross") && <span>✖️ Cross: <strong className="text-violet-400">{result.filter(r => r.type === "cross").length}</strong></span>}
+                <span>📊 Total: <strong className="text-white">{result.length}</strong></span>
               </div>
             </motion.div>
           )}

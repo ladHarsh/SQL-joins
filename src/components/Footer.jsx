@@ -1,53 +1,33 @@
 import { motion } from "framer-motion";
 
-// ======= FOOTER =======
 export default function Footer() {
   return (
-    <footer className="py-12 px-4 border-t border-cosmos-800/50 relative">
-      <div className="max-w-6xl mx-auto text-center">
-        {/* Venn Diagram Art */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true }}
-          className="mb-6"
-        >
-          <div className="inline-flex items-center gap-0 relative h-16">
-            <motion.div
-              animate={{ x: [0, -3, 0] }}
-              transition={{ duration: 3, repeat: Infinity }}
-              className="w-16 h-16 rounded-full border-2 border-nebula-blue/40"
-              style={{ background: "rgba(0,212,255,0.05)" }}
-            />
-            <motion.div
-              animate={{ x: [0, 3, 0] }}
-              transition={{ duration: 3, repeat: Infinity }}
-              className="w-16 h-16 rounded-full border-2 border-nebula-pink/40 -ml-6"
-              style={{ background: "rgba(255,107,205,0.05)" }}
-            />
+    <footer className="py-10 px-4 border-t border-slate-800/40">
+      <div className="max-w-5xl mx-auto text-center">
+        <motion.div initial={{ opacity: 0, scale: .85 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }}
+          className="mb-4">
+          <div className="inline-flex items-center relative h-14">
+            <motion.div animate={{ x: [0,-3,0] }} transition={{ duration: 3, repeat: Infinity }}
+              className="w-14 h-14 rounded-full border-2 border-cyan-500/30" style={{ background: "rgba(6,182,212,.03)" }} />
+            <motion.div animate={{ x: [0,3,0] }} transition={{ duration: 3, repeat: Infinity }}
+              className="w-14 h-14 rounded-full border-2 border-pink-500/30 -ml-5" style={{ background: "rgba(236,72,153,.03)" }} />
           </div>
         </motion.div>
-
-        <p className="text-cosmos-400 text-sm mb-2">
-          Built with 💜 for the most fun SQL lesson ever
+        <p className="text-slate-500 text-xs mb-1">
+          Built with 💜 for making SQL JOINs unforgettable
         </p>
-        <p className="text-cosmos-600 text-xs">
-          SQL JOIN Universe • Interactive Learning Experience • {new Date().getFullYear()}
+        <p className="text-slate-700 text-[.65rem]">
+          JOIN UNIVERSE • Interactive Learning • Gokuldham Society Approved 🏘️ • {new Date().getFullYear()}
         </p>
-
-        {/* Fun footer facts */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          className="mt-6 flex flex-wrap justify-center gap-4 text-xs text-cosmos-500"
-        >
-          <span>📊 No databases were harmed in making this</span>
+        <div className="mt-4 flex flex-wrap justify-center gap-3 text-[.6rem] text-slate-600">
+          <span>📊 No databases harmed</span>
           <span>•</span>
           <span>🚀 100% Frontend Magic</span>
           <span>•</span>
-          <span>🎮 Learning should be fun!</span>
-        </motion.div>
+          <span>🏘️ TMKOC Approved</span>
+          <span>•</span>
+          <span>🎮 Learning ≠ Boring</span>
+        </div>
       </div>
     </footer>
   );

@@ -1,120 +1,60 @@
 import { motion } from "framer-motion";
 
-// ======= LANDING / HERO SECTION =======
 export default function LandingHero({ onStart }) {
+  const floaters = [
+    { emoji: "📊", style: { top: "12%", left: "8%" },  anim: { y: [0,-18,0], rotate: [0,6,0] }, dur: 5.5 },
+    { emoji: "🗃️", style: { top: "18%", right: "7%" }, anim: { y: [0,14,0], rotate: [0,-5,0] }, dur: 4.8, delay: 1 },
+    { emoji: "🔗", style: { bottom: "22%", left: "12%" }, anim: { y: [0,-12,0] }, dur: 6, delay: 2 },
+    { emoji: "🧩", style: { bottom: "18%", right: "10%" }, anim: { y: [0,16,0], rotate: [0,-7,0] }, dur: 5, delay: .5 },
+    { emoji: "🏪", style: { top: "40%", left: "3%" }, anim: { y: [0,10,0] }, dur: 7, delay: 1.5 },
+  ];
+
   return (
-    <section
-      id="landing"
-      className="min-h-screen flex flex-col items-center justify-center relative px-4 text-center"
-    >
-      {/* Floating decorative elements */}
-      <motion.div
-        className="absolute text-6xl sm:text-8xl opacity-20"
-        style={{ top: "15%", left: "10%" }}
-        animate={{ y: [0, -20, 0], rotate: [0, 5, 0] }}
-        transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-      >
-        📊
-      </motion.div>
-      <motion.div
-        className="absolute text-5xl sm:text-7xl opacity-20"
-        style={{ top: "20%", right: "8%" }}
-        animate={{ y: [0, 15, 0], rotate: [0, -5, 0] }}
-        transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-      >
-        🗃️
-      </motion.div>
-      <motion.div
-        className="absolute text-4xl sm:text-6xl opacity-15"
-        style={{ bottom: "20%", left: "15%" }}
-        animate={{ y: [0, -15, 0], rotate: [0, 8, 0] }}
-        transition={{ duration: 7, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-      >
-        🔗
-      </motion.div>
-      <motion.div
-        className="absolute text-5xl sm:text-7xl opacity-15"
-        style={{ bottom: "25%", right: "12%" }}
-        animate={{ y: [0, 20, 0], rotate: [0, -6, 0] }}
-        transition={{ duration: 5.5, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
-      >
-        🧩
-      </motion.div>
+    <section className="min-h-screen flex flex-col items-center justify-center relative px-4 text-center">
+      {floaters.map((f, i) => (
+        <motion.div key={i}
+          className="absolute text-4xl sm:text-6xl opacity-15 select-none"
+          style={f.style}
+          animate={f.anim}
+          transition={{ duration: f.dur, repeat: Infinity, ease: "easeInOut", delay: f.delay || 0 }}
+        >{f.emoji}</motion.div>
+      ))}
 
-      {/* Hero Badge */}
-      <motion.div
-        initial={{ opacity: 0, scale: 0.8 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.6 }}
-        className="mb-6"
-      >
-        <span className="inline-block px-5 py-2 rounded-full text-sm font-medium glass-card text-cosmos-300 border border-cosmos-400/30">
-          🚀 Interactive SQL Learning Experience
+      <motion.div initial={{ opacity: 0, scale: .85 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: .5 }}
+        className="mb-5">
+        <span className="inline-block px-5 py-2 rounded-full text-xs sm:text-sm font-semibold glass text-indigo-300">
+          🚀 Interactive SQL Learning — No Boring Slides
         </span>
       </motion.div>
 
-      {/* Main Title */}
-      <motion.h1
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, delay: 0.2 }}
-        className="font-display font-black text-5xl sm:text-6xl md:text-7xl lg:text-8xl leading-tight mb-6"
-      >
-        <span className="block gradient-text">Welcome to</span>
-        <span className="block mt-2" style={{ color: "#fff" }}>
-          JOIN Universe
-        </span>
+      <motion.h1 initial={{ opacity: 0, y: 25 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: .7, delay: .15 }}
+        className="font-['Outfit'] font-black text-4xl sm:text-6xl md:text-7xl lg:text-8xl leading-[1.05] mb-5">
+        <span className="block grad-text">Welcome to</span>
+        <span className="block text-white mt-1">JOIN UNIVERSE</span>
       </motion.h1>
 
-      {/* Subtitle */}
-      <motion.p
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, delay: 0.5 }}
-        className="text-lg sm:text-xl md:text-2xl text-cosmos-300 max-w-2xl mb-4 font-light"
-      >
-        Where Tables Discover Their{" "}
-        <span className="gradient-text-warm font-semibold">Relationships</span>
+      <motion.p initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: .7, delay: .4 }}
+        className="text-base sm:text-xl text-slate-400 max-w-xl mb-3 font-light">
+        Where Tables Discover Their <span className="grad-warm font-bold">Relationships</span>
       </motion.p>
 
-      <motion.p
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, delay: 0.7 }}
-        className="text-sm sm:text-base text-cosmos-400 max-w-lg mb-10"
-      >
-        Master SQL JOINs through stunning visualizations, interactive quizzes,
-        and real-life memes. No boring slides. Just fun. 🎮
+      <motion.p initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: .7, delay: .6 }}
+        className="text-xs sm:text-sm text-slate-500 max-w-md mb-10">
+        Master SQL JOINs with TMKOC vibes 🏘️, Gen-Z humor 😂, and zero snoozefest energy. Ready?
       </motion.p>
 
-      {/* CTA Button */}
-      <motion.button
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, delay: 0.9 }}
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-        onClick={onStart}
-        className="glow-btn text-lg px-10 py-4 font-display"
-        id="start-experience-btn"
-      >
-        🚀 Start Experience
+      <motion.button initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: .7, delay: .8 }}
+        whileHover={{ scale: 1.06 }} whileTap={{ scale: .95 }}
+        onClick={onStart} className="glow-btn text-base sm:text-lg px-10 py-4"
+        id="start-learning-btn">
+        🚀 Start Learning
       </motion.button>
 
-      {/* Scroll indicator */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 2 }}
-        className="absolute bottom-8"
-      >
-        <motion.div
-          animate={{ y: [0, 10, 0] }}
-          transition={{ duration: 1.5, repeat: Infinity }}
-          className="text-cosmos-400 text-sm flex flex-col items-center gap-2"
-        >
-          <span>Scroll to explore</span>
-          <span className="text-xl">↓</span>
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2.5 }}
+        className="absolute bottom-6">
+        <motion.div animate={{ y: [0,8,0] }} transition={{ duration: 1.4, repeat: Infinity }}
+          className="text-slate-500 text-xs flex flex-col items-center gap-1">
+          <span>Scroll to explore</span><span className="text-lg">↓</span>
         </motion.div>
       </motion.div>
     </section>

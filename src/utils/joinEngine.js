@@ -1,133 +1,133 @@
-// ======= JOIN LOGIC ENGINE =======
-// Performs actual SQL-like JOIN operations on datasets
+// ====================================================
+//  JOIN ENGINE — All 7+ Join Types with Full Logic
+// ====================================================
 
-/**
- * INNER JOIN: Returns only rows where both tables have matching keys
- */
-export function innerJoin(leftTable, rightTable, leftKey, rightKey) {
+/** INNER JOIN: Only matching rows */
+export function innerJoin(left, right, lKey, rKey) {
   const results = [];
-  leftTable.forEach((leftRow) => {
-    rightTable.forEach((rightRow) => {
-      if (leftRow[leftKey] === rightRow[rightKey]) {
-        results.push({
-          left: { ...leftRow },
-          right: { ...rightRow },
-          type: "matched",
-        });
+  left.forEach(l => {
+    right.forEach(r => {
+      if (l[lKey] === r[rKey]) {
+        results.push({ left: { ...l }, right: { ...r }, type: "matched" });
       }
     });
   });
   return results;
 }
 
-/**
- * LEFT JOIN: Returns all left rows + matching right rows (NULL for unmatched)
- */
-export function leftJoin(leftTable, rightTable, leftKey, rightKey) {
+/** LEFT JOIN: All left + matching right (NULL if no match) */
+export function leftJoin(left, right, lKey, rKey) {
   const results = [];
-  leftTable.forEach((leftRow) => {
-    const matches = rightTable.filter((r) => r[rightKey] === leftRow[leftKey]);
+  left.forEach(l => {
+    const matches = right.filter(r => r[rKey] === l[lKey]);
     if (matches.length > 0) {
-      matches.forEach((rightRow) => {
-        results.push({
-          left: { ...leftRow },
-          right: { ...rightRow },
-          type: "matched",
-        });
-      });
+      matches.forEach(r => results.push({ left: { ...l }, right: { ...r }, type: "matched" }));
     } else {
-      results.push({
-        left: { ...leftRow },
-        right: null,
-        type: "null-fill",
-      });
+      results.push({ left: { ...l }, right: null, type: "null-fill" });
     }
   });
   return results;
 }
 
-/**
- * RIGHT JOIN: Returns all right rows + matching left rows (NULL for unmatched)
- */
-export function rightJoin(leftTable, rightTable, leftKey, rightKey) {
+/** RIGHT JOIN: All right + matching left */
+export function rightJoin(left, right, lKey, rKey) {
   const results = [];
-  rightTable.forEach((rightRow) => {
-    const matches = leftTable.filter((l) => l[leftKey] === rightRow[rightKey]);
+  right.forEach(r => {
+    const matches = left.filter(l => l[lKey] === r[rKey]);
     if (matches.length > 0) {
-      matches.forEach((leftRow) => {
-        results.push({
-          left: { ...leftRow },
-          right: { ...rightRow },
-          type: "matched",
-        });
-      });
+      matches.forEach(l => results.push({ left: { ...l }, right: { ...r }, type: "matched" }));
     } else {
-      results.push({
-        left: null,
-        right: { ...rightRow },
-        type: "null-fill",
-      });
+      results.push({ left: null, right: { ...r }, type: "null-fill" });
     }
   });
   return results;
 }
 
-/**
- * FULL OUTER JOIN: Returns all rows from both tables, matched and unmatched
- */
-export function fullJoin(leftTable, rightTable, leftKey, rightKey) {
+/** FULL OUTER JOIN: All rows from both */
+export function fullJoin(left, right, lKey, rKey) {
   const results = [];
   const matchedRightIds = new Set();
-
-  // First, iterate left table (like LEFT JOIN)
-  leftTable.forEach((leftRow) => {
-    const matches = rightTable.filter((r) => r[rightKey] === leftRow[leftKey]);
+  left.forEach(l => {
+    const matches = right.filter(r => r[rKey] === l[lKey]);
     if (matches.length > 0) {
-      matches.forEach((rightRow) => {
-        results.push({
-          left: { ...leftRow },
-          right: { ...rightRow },
-          type: "matched",
-        });
-        matchedRightIds.add(rightRow.id);
+      matches.forEach(r => {
+        results.push({ left: { ...l }, right: { ...r }, type: "matched" });
+        matchedRightIds.add(r.id);
       });
     } else {
-      results.push({
-        left: { ...leftRow },
-        right: null,
-        type: "null-fill",
-      });
+      results.push({ left: { ...l }, right: null, type: "null-fill" });
     }
   });
-
-  // Then add unmatched right rows
-  rightTable.forEach((rightRow) => {
-    if (!matchedRightIds.has(rightRow.id)) {
-      results.push({
-        left: null,
-        right: { ...rightRow },
-        type: "null-fill",
-      });
+  right.forEach(r => {
+    if (!matchedRightIds.has(r.id)) {
+      results.push({ left: null, right: { ...r }, type: "null-fill" });
     }
   });
-
   return results;
 }
 
-/**
- * Execute a join based on type string
- */
-export function executeJoin(type, leftTable, rightTable, leftKey, rightKey) {
+/** CROSS JOIN: Cartesian product */
+export function crossJoin(left, right) {
+  const results = [];
+  left.forEach(l => {
+    right.forEach(r => {
+      results.push({ left: { ...l }, right: { ...r }, type: "cross" });
+    });
+  });
+  return results;
+}
+
+/** SELF JOIN: Join table with itself using friendship data */
+export function selfJoin(residents, friendships) {
+  const results = [];
+  friendships.forEach(f => {
+    const person = residents.find(r => r.id === f.resident_id);
+    const friend = residents.find(r => r.id === f.best_friend_id);
+    if (person && friend) {
+      results.push({
+        left: { ...person },
+        right: { ...friend, label: f.label },
+        type: person.id === friend.id ? "self-ref" : "matched",
+      });
+    } else if (person) {
+      results.push({ left: { ...person }, right: null, type: "null-fill" });
+    }
+  });
+  return results;
+}
+
+/** NATURAL JOIN: Auto-match on shared column names */
+export function naturalJoin(left, right) {
+  // Find shared column names
+  const leftKeys = Object.keys(left[0] || {});
+  const rightKeys = Object.keys(right[0] || {});
+  const sharedKeys = leftKeys.filter(k => rightKeys.includes(k));
+
+  if (sharedKeys.length === 0) return [];
+
+  const results = [];
+  left.forEach(l => {
+    right.forEach(r => {
+      const match = sharedKeys.every(k => l[k] === r[k]);
+      if (match) {
+        const merged = { ...l, ...r };
+        results.push({ left: { ...l }, right: { ...r }, type: "matched", merged });
+      }
+    });
+  });
+  return results;
+}
+
+/** Master executor */
+export function executeJoin(type, config) {
   switch (type) {
-    case "INNER":
-      return innerJoin(leftTable, rightTable, leftKey, rightKey);
-    case "LEFT":
-      return leftJoin(leftTable, rightTable, leftKey, rightKey);
-    case "RIGHT":
-      return rightJoin(leftTable, rightTable, leftKey, rightKey);
-    case "FULL":
-      return fullJoin(leftTable, rightTable, leftKey, rightKey);
-    default:
-      return [];
+    case "INNER":   return innerJoin(config.left, config.right, config.lKey, config.rKey);
+    case "LEFT":    return leftJoin(config.left, config.right, config.lKey, config.rKey);
+    case "RIGHT":   return rightJoin(config.left, config.right, config.lKey, config.rKey);
+    case "FULL":    return fullJoin(config.left, config.right, config.lKey, config.rKey);
+    case "CROSS":   return crossJoin(config.crossLeft || config.left, config.crossRight || config.right);
+    case "SELF":    return selfJoin(config.selfTable, config.friendships);
+    case "NATURAL": return naturalJoin(config.natLeft, config.natRight);
+    default:        return [];
   }
 }

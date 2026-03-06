@@ -1,243 +1,280 @@
-// ======= FUN DATASETS FOR JOIN DEMONSTRATIONS =======
+// ====================================================
+//  JOIN UNIVERSE — TMKOC + Gen-Z Themed Datasets
+// ====================================================
 
-export const students = [
-  { id: 1, name: "Aarav 🧑‍💻", emoji: "🧑‍💻", major: "CS", gpa: 3.8 },
-  { id: 2, name: "Priya 👩‍🔬", emoji: "👩‍🔬", major: "Physics", gpa: 3.9 },
-  { id: 3, name: "Ravi 🎨", emoji: "🎨", major: "Art", gpa: 3.5 },
-  { id: 4, name: "Sneha 📊", emoji: "📊", major: "Stats", gpa: 3.7 },
-  { id: 5, name: "Kabir 🎮", emoji: "🎮", major: "GameDev", gpa: 3.6 },
+// ─── PRIMARY DATASET: Taarak Mehta Residents ──────
+export const residents = [
+  { id: 1, name: "Jethalal",   emoji: "🤵", flat: "A1", society: "Gokuldham" },
+  { id: 2, name: "Daya",       emoji: "💃", flat: "A1", society: "Gokuldham" },
+  { id: 3, name: "Taarak",     emoji: "🧠", flat: "A2", society: "Gokuldham" },
+  { id: 4, name: "Bhide",      emoji: "📏", flat: "B1", society: "Gokuldham" },
+  { id: 5, name: "Popatlal",   emoji: "📰", flat: "B2", society: "Gokuldham" },
+  { id: 6, name: "Sodhi",      emoji: "🎉", flat: "C1", society: "Gokuldham" },
+  { id: 7, name: "Iyer",       emoji: "🔬", flat: "C2", society: "Gokuldham" },
 ];
 
-export const courses = [
-  { id: 101, student_id: 1, course: "Databases 🗃️", grade: "A" },
-  { id: 102, student_id: 2, course: "Quantum 🔬", grade: "A+" },
-  { id: 103, student_id: 1, course: "Algorithms 🧩", grade: "B+" },
-  { id: 104, student_id: 6, course: "Music 🎵", grade: "A" },
-  { id: 105, student_id: 3, course: "Painting 🖌️", grade: "A-" },
+export const professions = [
+  { id: 101, resident_id: 1, profession: "Electronics Shop Owner", icon: "🏪" },
+  { id: 102, resident_id: 3, profession: "Patent Lawyer",         icon: "⚖️" },
+  { id: 103, resident_id: 4, profession: "School Teacher",        icon: "🏫" },
+  { id: 104, resident_id: 5, profession: "Newspaper Reporter",    icon: "📰" },
+  { id: 105, resident_id: 7, profession: "Scientist at ISRO",     icon: "🚀" },
+  { id: 106, resident_id: 8, profession: "Doctor (Unknown)",      icon: "🩺" },
 ];
 
-// ======= HEROES & SIDEKICKS (Fun alternate dataset) =======
-export const heroes = [
-  { id: 1, name: "Iron Man 🦾", power: "Tech Genius", level: 95 },
-  { id: 2, name: "Spider-Man 🕷️", power: "Web Slinger", level: 88 },
-  { id: 3, name: "Thor ⚡", power: "Thunder God", level: 98 },
-  { id: 4, name: "Hulk 💪", power: "Super Strength", level: 99 },
-  { id: 5, name: "Black Widow 🕵️", power: "Spy Skills", level: 90 },
+// ─── SELF-JOIN: Friendships within residents ──────
+export const friendships = [
+  { resident_id: 1, best_friend_id: 3, label: "Business buddies" },
+  { resident_id: 3, best_friend_id: 1, label: "Intellectual rivals" },
+  { resident_id: 4, best_friend_id: 6, label: "Neighbours" },
+  { resident_id: 5, best_friend_id: 5, label: "Popatlal is his own best friend 😢" },
+  { resident_id: 6, best_friend_id: 4, label: "Party + Discipline combo" },
 ];
 
-export const sidekicks = [
-  { id: 201, hero_id: 1, name: "JARVIS 🤖", role: "AI Assistant" },
-  { id: 202, hero_id: 2, name: "Ned Leeds 🧑", role: "Guy in Chair" },
-  { id: 203, hero_id: 1, name: "Pepper Potts 👩‍💼", role: "CEO" },
-  { id: 204, hero_id: 6, name: "Robin 🦅", role: "Partner" },
-  { id: 205, hero_id: 3, name: "Valkyrie ⚔️", role: "Warrior" },
+// ─── CROSS-JOIN: Society Events ──────
+export const events = [
+  { id: 1, event: "Garba Night 💃" },
+  { id: 2, event: "Cricket Match 🏏" },
+  { id: 3, event: "Holi Party 🎨" },
 ];
 
-// ======= DATASET METADATA =======
-export const datasets = {
-  students: {
-    leftTable: { name: "Students", data: students, key: "id", displayFields: ["name", "major"] },
-    rightTable: { name: "Courses", data: courses, key: "student_id", displayFields: ["course", "grade"] },
-    joinKey: { left: "id", right: "student_id" },
-  },
-  heroes: {
-    leftTable: { name: "Heroes", data: heroes, key: "id", displayFields: ["name", "power"] },
-    rightTable: { name: "Sidekicks", data: sidekicks, key: "hero_id", displayFields: ["name", "role"] },
-    joinKey: { left: "id", right: "hero_id" },
-  },
-};
-
-// ======= QUIZ QUESTIONS =======
-export const quizQuestions = [
-  {
-    id: 1,
-    question: "Which JOIN returns only the rows that have matching values in BOTH tables?",
-    options: ["INNER JOIN", "LEFT JOIN", "RIGHT JOIN", "FULL JOIN"],
-    correct: 0,
-    explanation: "INNER JOIN returns only the matching rows from both tables — like a strict bouncer at a club! 🚪",
-    emoji: "🎯",
-  },
-  {
-    id: 2,
-    question: "Which JOIN keeps ALL rows from the LEFT table, even without a match?",
-    options: ["INNER JOIN", "LEFT JOIN", "RIGHT JOIN", "CROSS JOIN"],
-    correct: 1,
-    explanation: "LEFT JOIN says: 'Everyone from the left table gets in, matches or not!' The unmatched ones get NULLs. 🤷",
-    emoji: "⬅️",
-  },
-  {
-    id: 3,
-    question: "Student Aarav (id=1) exists in Students but NOT in Courses. After a RIGHT JOIN on Students, Aarav will...",
-    options: [
-      "Appear with NULL values",
-      "Not appear at all",
-      "Appear normally",
-      "Cause an error",
-    ],
-    correct: 1,
-    explanation: "RIGHT JOIN prioritizes the RIGHT table. Since Aarav is in the LEFT table only, he's excluded! 😢",
-    emoji: "🤔",
-  },
-  {
-    id: 4,
-    question: "FULL OUTER JOIN is like combining which two JOINs?",
-    options: [
-      "LEFT JOIN + RIGHT JOIN",
-      "INNER JOIN + CROSS JOIN",
-      "INNER JOIN + LEFT JOIN",
-      "Self JOIN + INNER JOIN",
-    ],
-    correct: 0,
-    explanation: "FULL OUTER JOIN = LEFT JOIN ∪ RIGHT JOIN. Everyone's invited to the party! 🎉",
-    emoji: "🔄",
-  },
-  {
-    id: 5,
-    question: "What value appears when there's no matching row in a LEFT or RIGHT JOIN?",
-    options: ["0", "Empty string", "NULL", "undefined"],
-    correct: 2,
-    explanation: "NULL is SQL's way of saying 'I got nothing here.' It's not 0, not empty, just... nothing! 👻",
-    emoji: "👻",
-  },
-  {
-    id: 6,
-    question: "If Table A has 5 rows and Table B has 3 rows with 2 matches, how many rows does INNER JOIN return?",
-    options: ["8", "5", "3", "2"],
-    correct: 3,
-    explanation: "INNER JOIN only returns matching rows. 2 matches = 2 rows. Simple math! 🔢",
-    emoji: "🔢",
-  },
-  {
-    id: 7,
-    question: "Which real-life scenario is most like a LEFT JOIN?",
-    options: [
-      "A class register with student grades (some students haven't submitted)",
-      "A list of mutual friends",
-      "A random seating arrangement",
-      "A list of couples at a party",
-    ],
-    correct: 0,
-    explanation: "All students appear on the register, but some have NULL grades — classic LEFT JOIN! 📋",
-    emoji: "📋",
-  },
-  {
-    id: 8,
-    question: "TRUE or FALSE: INNER JOIN can return more rows than the original tables if there are multiple matches.",
-    options: ["TRUE", "FALSE", "Only with DISTINCT", "Only with GROUP BY"],
-    correct: 0,
-    explanation: "If a row in Table A matches 3 rows in Table B, you get 3 result rows! JOINs can multiply! 📈",
-    emoji: "📈",
-  },
+// ─── NATURAL JOIN DATASET ──────
+export const studentRecords = [
+  { student_name: "Tapu",  grade: "10th", score: 45 },
+  { student_name: "Goli",  grade: "10th", score: 72 },
+  { student_name: "Sonu",  grade: "10th", score: 95 },
 ];
 
-// ======= REAL-LIFE JOIN EXAMPLES (HUMOROUS) =======
-export const realLifeJoins = [
-  {
-    id: 1,
-    title: "Dating App: The INNER JOIN 💕",
-    type: "INNER JOIN",
-    color: "#00d4ff",
-    scenario: "Only people who BOTH swiped right on each other get matched. No mutual interest? No date!",
-    leftTable: "Your Swipes ➡️",
-    rightTable: "Their Swipes ➡️",
-    result: "Only mutual matches show up! 💑",
-    memeText: "When both tables have feelings for each other...",
-    emoji: "💕",
-  },
-  {
-    id: 2,
-    title: "Group Project: The LEFT JOIN 😅",
-    type: "LEFT JOIN",
-    color: "#00ff9d",
-    scenario: "ALL students are listed in the project group. Some contribute work, some contribute... moral support (NULL contribution).",
-    leftTable: "All Students 📚",
-    rightTable: "Actual Contributions 📝",
-    result: "Everyone's listed, some have NULL work! 😴",
-    memeText: "LEFT JOIN: Where freeloaders get NULL and still pass...",
-    emoji: "😅",
-  },
-  {
-    id: 3,
-    title: "Food Delivery: The RIGHT JOIN 🍕",
-    type: "RIGHT JOIN",
-    color: "#ff6bcd",
-    scenario: "ALL restaurants are shown on the app. If nobody ordered from a restaurant, it still appears with NULL orders.",
-    leftTable: "Customer Orders 🛒",
-    rightTable: "All Restaurants 🏪",
-    result: "Every restaurant shown, some with no orders! 😢",
-    memeText: "That sad restaurant with 0 orders but still on the app...",
-    emoji: "🍕",
-  },
-  {
-    id: 4,
-    title: "College Reunion: The FULL JOIN 🎓",
-    type: "FULL JOIN",
-    color: "#ff9f43",
-    scenario: "Everyone from BOTH graduating classes is invited. Even if someone doesn't know anyone from the other class, they still show up!",
-    leftTable: "Class of 2024 🎓",
-    rightTable: "Class of 2025 🎓",
-    result: "EVERYONE is included, matched or not! 🎉",
-    memeText: "FULL JOIN: The party where even NULLs are welcome!",
-    emoji: "🎓",
-  },
-  {
-    id: 5,
-    title: "Instagram: The INNER JOIN 📸",
-    type: "INNER JOIN",
-    color: "#00d4ff",
-    scenario: "You only see posts from people you follow AND who have posted something. Following a ghost account? Nothing shows up!",
-    leftTable: "Your Following List 👥",
-    rightTable: "Posted Content 📷",
-    result: "Only followed accounts WITH posts appear! 🖼️",
-    memeText: "Following 500 people but your feed is empty...",
-    emoji: "📸",
-  },
-  {
-    id: 6,
-    title: "Netflix & Friends: The LEFT JOIN 🎬",
-    type: "LEFT JOIN",
-    color: "#00ff9d",
-    scenario: "ALL your friends are listed. Some have Netflix recommendations, some just stare at the screen and say 'whatever you want'.",
-    leftTable: "All Your Friends 👫",
-    rightTable: "Movie Recommendations 🎥",
-    result: "All friends listed, some with NULL suggestions! 🤷",
-    memeText: "'I don't care, you pick' = NULL recommendation",
-    emoji: "🎬",
-  },
+export const gradeInfo = [
+  { grade: "10th", teacher: "Bhide Sir 📏", subject: "Maths" },
+  { grade: "11th", teacher: "New Teacher 🧑‍🏫", subject: "Physics" },
 ];
 
-// ======= JOIN TYPE DESCRIPTIONS =======
+
+// ====================================================
+//  JOIN TYPE INFO — Explanations, Analogies, SQL
+// ====================================================
 export const joinDescriptions = {
   INNER: {
     name: "INNER JOIN",
     icon: "🎯",
-    color: "#00d4ff",
-    shortDesc: "Returns only matching rows from both tables",
-    sql: "SELECT * FROM Students INNER JOIN Courses ON Students.id = Courses.student_id",
-    analogy: "Like a strict bouncer — you need to be on BOTH lists to get in!",
+    color: "#06b6d4",
+    tagline: "Only the matches survive",
+    shortDesc: "Returns rows that have matching values in BOTH tables.",
+    realLife: "Only Gokuldham residents who have a known profession show up. Daya & Sodhi? Sorry, no profession entry — they're OUT!",
+    sql: "SELECT * FROM residents\nINNER JOIN professions\nON residents.id = professions.resident_id;",
+    rule: "Both tables must agree ✅",
+    vennHighlight: "intersection",
   },
   LEFT: {
     name: "LEFT JOIN",
     icon: "⬅️",
-    color: "#00ff9d",
-    shortDesc: "Returns ALL rows from the left table + matches from right",
-    sql: "SELECT * FROM Students LEFT JOIN Courses ON Students.id = Courses.student_id",
-    analogy: "Left table VIPs get in no matter what. Right table? Only if you match!",
+    color: "#22c55e",
+    tagline: "Left table is the boss",
+    shortDesc: "Returns ALL rows from left table + matches from right. Unmatched = NULL.",
+    realLife: "ALL residents are shown, even if we don't know their profession. Daya shows up with profession = NULL (she's busy with Garba 💃).",
+    sql: "SELECT * FROM residents\nLEFT JOIN professions\nON residents.id = professions.resident_id;",
+    rule: "Left table → ALL rows, right → only matches",
+    vennHighlight: "left",
   },
   RIGHT: {
     name: "RIGHT JOIN",
     icon: "➡️",
-    color: "#ff6bcd",
-    shortDesc: "Returns ALL rows from the right table + matches from left",
-    sql: "SELECT * FROM Students RIGHT JOIN Courses ON Students.id = Courses.student_id",
-    analogy: "Right table VIPs enter freely. Left table needs a match to tag along!",
+    color: "#ec4899",
+    tagline: "Right table is the boss",
+    shortDesc: "Returns ALL rows from right table + matches from left. Unmatched = NULL.",
+    realLife: "ALL professions listed, even 'Doctor (id=8)' who has no matching resident. The mystery doctor shows with resident = NULL! 🩺👻",
+    sql: "SELECT * FROM residents\nRIGHT JOIN professions\nON residents.id = professions.resident_id;",
+    rule: "Right table → ALL rows, left → only matches",
+    vennHighlight: "right",
   },
   FULL: {
     name: "FULL OUTER JOIN",
     icon: "🔄",
-    color: "#ff9f43",
-    shortDesc: "Returns ALL rows from both tables, matched or not",
-    sql: "SELECT * FROM Students FULL OUTER JOIN Courses ON Students.id = Courses.student_id",
-    analogy: "Open-door party! Everyone from both tables is welcome, NULLs and all!",
+    color: "#f59e0b",
+    tagline: "Everyone's invited!",
+    shortDesc: "Returns ALL rows from BOTH tables. NULLs fill the gaps.",
+    realLife: "Every resident AND every profession shows up. No match? Fill with NULL. It's the Gokuldham reunion — nobody gets left behind! 🎉",
+    sql: "SELECT * FROM residents\nFULL OUTER JOIN professions\nON residents.id = professions.resident_id;",
+    rule: "Both tables → ALL rows, gaps filled with NULL",
+    vennHighlight: "full",
+  },
+  CROSS: {
+    name: "CROSS JOIN",
+    icon: "✖️",
+    color: "#8b5cf6",
+    tagline: "Every possible combo!",
+    shortDesc: "Returns the Cartesian product — every row from A paired with every row from B.",
+    realLife: `Every resident × every society event. Jethalal at Garba? ✅ Bhide at Cricket? ✅ That's ${7} × ${3} = ${7*3} rows! Everyone goes everywhere.`,
+    sql: "SELECT * FROM residents\nCROSS JOIN events;",
+    rule: "Rows = Left count × Right count",
+    vennHighlight: "cross",
+  },
+  SELF: {
+    name: "SELF JOIN",
+    icon: "🪞",
+    color: "#f43f5e",
+    tagline: "Table meets itself",
+    shortDesc: "A table is joined with itself — useful for hierarchies & relationships within the same data.",
+    realLife: "Who is whose best friend in Gokuldham? Join the residents table with ITSELF! Popatlal's best friend is... Popatlal 😢",
+    sql: "SELECT a.name, b.name AS best_friend\nFROM residents a\nJOIN friendships f ON a.id = f.resident_id\nJOIN residents b ON f.best_friend_id = b.id;",
+    rule: "Same table, aliased as A & B",
+    vennHighlight: "self",
+  },
+  NATURAL: {
+    name: "NATURAL JOIN",
+    icon: "🌿",
+    color: "#14b8a6",
+    tagline: "Auto-match common columns",
+    shortDesc: "Automatically joins on columns with the SAME name in both tables. No ON clause needed!",
+    realLife: "Students and grade info share a 'grade' column. SQL automatically matches them — Tapu, Goli, Sonu all link to Bhide Sir!",
+    sql: "SELECT * FROM studentRecords\nNATURAL JOIN gradeInfo;",
+    rule: 'Auto-match on shared column names',
+    vennHighlight: "natural",
   },
 };
+
+
+// ====================================================
+//  QUIZ QUESTIONS — TMKOC + Gen-Z Scenarios
+// ====================================================
+export const quizQuestions = [
+  {
+    id: 1,
+    emoji: "🎯",
+    scenario: "Jethalal wants to see ONLY residents who have a profession listed.",
+    question: "Which JOIN should he use?",
+    options: ["INNER JOIN", "LEFT JOIN", "FULL JOIN", "CROSS JOIN"],
+    correct: 0,
+    explanation: "INNER JOIN! Only rows matching in BOTH tables show up. No profession = no entry. 🎯",
+  },
+  {
+    id: 2,
+    emoji: "⬅️",
+    scenario: "Bhide Sir is taking attendance. He wants ALL residents listed, even if their profession is unknown.",
+    question: "Which JOIN ensures no resident is missed?",
+    options: ["INNER JOIN", "RIGHT JOIN", "LEFT JOIN", "SELF JOIN"],
+    correct: 2,
+    explanation: "LEFT JOIN! All residents (left table) appear. Unknown profession? That's a NULL, not absence! 📋",
+  },
+  {
+    id: 3,
+    emoji: "📸",
+    scenario: "You follow 500 people on Instagram. Some have posted stories, some haven't.",
+    question: "To see your feed (only people who posted), which JOIN matches?",
+    options: ["LEFT JOIN", "INNER JOIN", "FULL JOIN", "CROSS JOIN"],
+    correct: 1,
+    explanation: "INNER JOIN! Your feed shows only followed accounts that also have posts. No post = no show! 📱",
+  },
+  {
+    id: 4,
+    emoji: "✖️",
+    scenario: "Gokuldham is planning events. They need every resident paired with every event for the schedule.",
+    question: "Which JOIN creates ALL possible resident-event pairs?",
+    options: ["INNER JOIN", "LEFT JOIN", "CROSS JOIN", "NATURAL JOIN"],
+    correct: 2,
+    explanation: "CROSS JOIN! Every resident × every event = all possible combos. 7 residents × 3 events = 21 rows! 🎪",
+  },
+  {
+    id: 5,
+    emoji: "🪞",
+    scenario: "Popatlal wants to know who is whose best friend within Gokuldham residents.",
+    question: "Which JOIN can find relationships WITHIN the same table?",
+    options: ["LEFT JOIN", "RIGHT JOIN", "SELF JOIN", "FULL JOIN"],
+    correct: 2,
+    explanation: "SELF JOIN! The table joins itself with aliases. Spoiler: Popatlal's best friend is... himself. 😅",
+  },
+  {
+    id: 6,
+    emoji: "🎮",
+    scenario: "In your college, ALL students are listed. Some have joined clubs, some haven't. You want the COMPLETE picture.",
+    question: "Which JOIN keeps everyone from BOTH tables?",
+    options: ["INNER JOIN", "LEFT JOIN", "FULL OUTER JOIN", "CROSS JOIN"],
+    correct: 2,
+    explanation: "FULL OUTER JOIN! Every student AND every club shows up. No match? NULL fills the gap. Nobody's left out! 🎓",
+  },
+  {
+    id: 7,
+    emoji: "🌿",
+    scenario: "Two tables share a column called 'grade'. You want SQL to auto-detect and join on it.",
+    question: "Which JOIN does this automatically?",
+    options: ["INNER JOIN", "NATURAL JOIN", "SELF JOIN", "CROSS JOIN"],
+    correct: 1,
+    explanation: "NATURAL JOIN! It auto-matches columns with the same name. No ON clause needed — SQL figures it out! 🧠",
+  },
+  {
+    id: 8,
+    emoji: "➡️",
+    scenario: "A company HR has a list of job roles. Some roles are vacant (no employee). They want ALL roles visible.",
+    question: "Which JOIN ensures all roles from the right table appear?",
+    options: ["LEFT JOIN", "RIGHT JOIN", "INNER JOIN", "SELF JOIN"],
+    correct: 1,
+    explanation: "RIGHT JOIN! All roles (right table) appear, even vacant ones. Employee column = NULL for unfilled roles. 💼",
+  },
+  {
+    id: 9,
+    emoji: "🔢",
+    scenario: "Table A has 5 rows, Table B has 4 rows, and 3 rows match between them.",
+    question: "How many rows does INNER JOIN return?",
+    options: ["9", "5", "3", "20"],
+    correct: 2,
+    explanation: "INNER JOIN returns ONLY matching rows. 3 matches = 3 rows. Not adding, not multiplying — just matching! 🎯",
+  },
+  {
+    id: 10,
+    emoji: "💡",
+    scenario: "You want to combine results from two queries that have the same columns, removing duplicates.",
+    question: "This sounds like…",
+    options: ["INNER JOIN", "UNION", "CROSS JOIN", "LEFT JOIN"],
+    correct: 1,
+    explanation: "UNION! It stacks results vertically and removes duplicates. JOIN combines horizontally. Big difference! 📊",
+  },
+];
+
+
+// ====================================================
+//  DECISION HELPER — flowchart logic
+// ====================================================
+export const decisionTree = [
+  {
+    id: "q1",
+    question: "Do you want rows from BOTH tables or just ONE?",
+    options: [
+      { label: "Both tables", next: "q2" },
+      { label: "Mainly one table", next: "q3" },
+      { label: "All possible combos", result: "CROSS" },
+      { label: "Relationships within same table", result: "SELF" },
+    ],
+  },
+  {
+    id: "q2",
+    question: "Should ONLY matching rows appear, or ALL rows (with NULLs for gaps)?",
+    options: [
+      { label: "Only matching rows", result: "INNER" },
+      { label: "ALL rows from both, fill gaps with NULL", result: "FULL" },
+      { label: "Auto-match by shared column names", result: "NATURAL" },
+    ],
+  },
+  {
+    id: "q3",
+    question: "Which table should show ALL its rows?",
+    options: [
+      { label: "The LEFT (first) table", result: "LEFT" },
+      { label: "The RIGHT (second) table", result: "RIGHT" },
+    ],
+  },
+];
+
+
+// ====================================================
+//  CHEAT SHEET DATA
+// ====================================================
+export const cheatSheetItems = [
+  { type: "INNER",   rule: "Only matches",          icon: "🎯", color: "#06b6d4", mnemonic: "Both tables must agree" },
+  { type: "LEFT",    rule: "Left table = boss",      icon: "⬅️", color: "#22c55e", mnemonic: "All left + matches from right" },
+  { type: "RIGHT",   rule: "Right table = boss",     icon: "➡️", color: "#ec4899", mnemonic: "All right + matches from left" },
+  { type: "FULL",    rule: "Keep everything",         icon: "🔄", color: "#f59e0b", mnemonic: "All rows, NULLs fill gaps" },
+  { type: "CROSS",   rule: "All combos (A × B)",      icon: "✖️", color: "#8b5cf6", mnemonic: "Every row paired with every row" },
+  { type: "SELF",    rule: "Table joins itself",      icon: "🪞", color: "#f43f5e", mnemonic: "Same table, different aliases" },
+  { type: "NATURAL", rule: "Auto-match columns",      icon: "🌿", color: "#14b8a6", mnemonic: "No ON clause needed" },
+];
