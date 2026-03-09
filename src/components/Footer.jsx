@@ -14,19 +14,19 @@ export default function Footer() {
           </div>
         </motion.div>
         <p className="text-slate-500 text-xs mb-1">
-          Built with 💜 for making SQL JOINs unforgettable
+          Built for interactive SQL JOIN learning
         </p>
         <p className="text-slate-700 text-[.65rem]">
-          JOIN UNIVERSE • Interactive Learning • Gokuldham Society Approved 🏘️ • {new Date().getFullYear()}
+          JOIN UNIVERSE • Interactive Learning Platform • {new Date().getFullYear()}
         </p>
         <div className="mt-4 flex flex-wrap justify-center gap-3 text-[.6rem] text-slate-600">
-          <span>📊 No databases harmed</span>
+          <span>100% Frontend</span>
           <span>•</span>
-          <span>🚀 100% Frontend Magic</span>
+          <span>No Database Required</span>
           <span>•</span>
-          <span>🏘️ TMKOC Approved</span>
+          <span>AI-Powered Assistance</span>
           <span>•</span>
-          <span>🎮 Learning ≠ Boring</span>
+          <span>Mobile Responsive</span>
         </div>
       </div>
     </footer>

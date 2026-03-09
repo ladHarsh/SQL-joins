@@ -3,17 +3,17 @@ import { motion, AnimatePresence } from "framer-motion";
 
 // ─── Curated fallback knowledge base ───
 const fallbacks = {
-  "inner join": "INNER JOIN returns only rows that match in both tables. Think of it like a strict bouncer — no match, no entry! If Jethalal has a profession entry and Daya doesn't, only Jethalal shows up. 🎯",
-  "left join": "LEFT JOIN keeps ALL rows from the left table and fills NULLs for unmatched rows from the right. It's like Bhide's attendance — everyone on the left list is present, missing data = NULL! ⬅️",
-  "right join": "RIGHT JOIN keeps ALL rows from the right table and fills NULLs for unmatched left rows. Like listing all professions — even if no resident matches a role, the profession still shows up! ➡️",
-  "full join": "FULL OUTER JOIN keeps ALL rows from BOTH tables. No row is left behind! NULLs fill the gaps. It's the Gokuldham reunion — everyone's invited! 🔄",
-  "cross join": "CROSS JOIN produces the Cartesian product — every row from A paired with every row from B. 7 residents × 3 events = 21 rows! It's like assigning every person to every event. ✖️",
-  "self join": "SELF JOIN is when a table joins with itself, using aliases. Perfect for finding relationships within the same data, like 'who is whose best friend' in a single residents table! 🪞",
-  "natural join": "NATURAL JOIN automatically matches columns with the same name in both tables. No ON clause needed — SQL figures it out on its own! Just make sure the shared column names are intentional. 🌿",
-  "null": "NULL in JOINs means 'no matching data'. When LEFT JOIN shows a resident without a profession, the profession column becomes NULL — not zero, not blank, just 'unknown'! 👻",
-  "difference": "INNER = only matches. LEFT = all left + matches. RIGHT = all right + matches. FULL = everything. CROSS = all combos. SELF = same table. It's a spectrum from strict to everything! 📊",
-  "when": "Use INNER when you need only matching data. LEFT when the left table is your priority. FULL when you can't afford to lose ANY row. CROSS for combinations. SELF for self-referencing data! 🧠",
-  "union": "UNION stacks rows vertically (combining results), while JOIN merges columns horizontally (combining tables). UNION needs same columns; JOIN needs a key relationship! 📊",
+  "inner join": "INNER JOIN returns only rows that match in both tables. Think of it like a strict bouncer — no match, no entry! If a resident has no event role, they won't appear in the result.",
+  "left join": "LEFT JOIN keeps ALL rows from the left table and fills NULLs for unmatched rows from the right. Like an attendance register — every name stays, but missing data shows up as NULL.",
+  "right join": "RIGHT JOIN keeps ALL rows from the right table and fills NULLs for unmatched left rows. Like listing all job positions — even vacant ones with no employee assigned appear in the result.",
+  "full join": "FULL OUTER JOIN keeps ALL rows from BOTH tables. No row is left behind — NULLs fill the gaps on either side. It's the complete picture where nothing gets excluded.",
+  "cross join": "CROSS JOIN produces the Cartesian product — every row from A paired with every row from B. 7 rows × 3 rows = 21 results. No condition needed, just pure combination.",
+  "self join": "SELF JOIN is when a table joins with itself, using aliases (like A and B). It's useful for finding relationships within the same data, such as manager-employee hierarchies.",
+  "natural join": "NATURAL JOIN automatically matches columns with the same name in both tables. No ON clause needed — SQL figures it out. Just make sure the shared column names are intentional.",
+  "null": "NULL in JOINs means 'no matching data on this side'. When LEFT JOIN shows a resident without a role, the role column becomes NULL — not zero, not blank, just 'no data available'.",
+  "difference": "INNER = only matches. LEFT = all left + matches. RIGHT = all right + matches. FULL = everything. CROSS = all combos. SELF = same table. Each serves a different purpose.",
+  "when": "Use INNER when you need only matching data. LEFT when the left table is your priority. FULL when you can't afford to lose ANY row. CROSS for all combinations. SELF for same-table relationships.",
+  "union": "UNION stacks rows vertically (combining results), while JOIN merges columns horizontally (combining tables). UNION needs same columns; JOIN needs a key relationship.",
 };
 
 function findFallback(q) {
@@ -29,13 +29,13 @@ function findFallback(q) {
   if (l.includes("diff") || l.includes("vs") || l.includes("compare")) return fallbacks["difference"];
   if (l.includes("when") || l.includes("use") || l.includes("should")) return fallbacks["when"];
   if (l.includes("union")) return fallbacks["union"];
-  return "Great question! SQL JOINs combine rows from two or more tables based on related columns. The main types are INNER (only matches), LEFT (all from left), RIGHT (all from right), FULL (everything), CROSS (all combos), and SELF (table with itself). Try asking about a specific type! 🚀";
+  return "SQL JOINs combine rows from two or more tables based on related columns. The main types are INNER (only matches), LEFT (all from left), RIGHT (all from right), FULL (everything), CROSS (all combos), and SELF (table with itself). Try asking about a specific join type for detailed info!";
 }
 
 export default function AskAI() {
   const [msgs, setMsgs] = useState([{
     role: "ai",
-    text: "Hey! 👋 I'm your JOIN Guru. Ask me anything about SQL JOINs — like:\n\n• When should I use LEFT JOIN?\n• What's the difference between INNER and FULL?\n• Explain CROSS JOIN with an example\n• UNION vs JOIN?\n\nLet's go! 🚀",
+    text: "Hi! I'm JOIN Guru — your SQL joins assistant.\n\nAsk me anything about SQL JOINs:\n\n• When should I use LEFT JOIN?\n• What's the difference between INNER and FULL?\n• Explain CROSS JOIN with an example\n• UNION vs JOIN?\n\nI'll keep it short and clear.",
   }]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -52,7 +52,6 @@ export default function AskAI() {
     setLoading(true);
 
     try {
-      // Try serverless API first
       const res = await fetch("/api/ask-ai", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -87,10 +86,10 @@ export default function AskAI() {
       <div className="max-w-2xl mx-auto">
         <motion.div initial={{ opacity: 0, y: 18 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
           className="text-center mb-8">
-          <h2 className="sec-head grad-text mb-2">🤖 Ask JOIN Guru</h2>
+          <h2 className="sec-head grad-text mb-2">Ask JOIN Guru</h2>
           <p className="text-slate-400 text-sm max-w-md mx-auto">
-            Confused about a JOIN? Ask the Guru and get a simple, fun answer.
-            Works even offline with built-in knowledge! 📚
+            Have a question about SQL JOINs? Ask the Guru for a clear, beginner-friendly explanation.
+            Works even offline with built-in answers.
           </p>
         </motion.div>
 
@@ -105,7 +104,7 @@ export default function AskAI() {
                 <div className={`chat-bubble ${m.role === "user" ? "chat-user" : "chat-ai"}`}>
                   {m.role === "ai" && (
                     <span className="text-[.6rem] block mb-1 text-slate-500">
-                      {m.isFallback ? "📚 Built-in Knowledge" : "🤖 JOIN Guru"}
+                      {m.isFallback ? "Built-in Knowledge" : "JOIN Guru (AI)"}
                     </span>
                   )}
                   {m.text}
@@ -136,7 +135,7 @@ export default function AskAI() {
             <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: .95 }}
               type="submit" disabled={loading || !input.trim()}
               className="px-5 py-2.5 rounded-xl text-sm font-bold bg-indigo-600 text-white hover:bg-indigo-500 disabled:opacity-35 disabled:cursor-not-allowed transition-all">
-              Send 🚀
+              Send
             </motion.button>
           </form>
         </motion.div>
@@ -146,7 +145,7 @@ export default function AskAI() {
           {suggestions.map(s => (
             <button key={s} onClick={() => setInput(s)}
               className="px-2.5 py-1 rounded-lg text-[.65rem] glass text-slate-500 hover:text-white transition-colors">
-              💬 {s}
+              {s}
             </button>
           ))}
         </div>

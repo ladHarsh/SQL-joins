@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { residents, professions, friendships, events, studentRecords, gradeInfo, joinDescriptions } from "../data/datasets";
+import { residents, societyEvents, friendships, events, studentRecords, gradeInfo, joinDescriptions, storyDescriptions } from "../data/datasets";
 import { executeJoin } from "../utils/joinEngine";
 
 const TYPES = ["INNER", "LEFT", "RIGHT", "FULL", "CROSS", "SELF", "NATURAL"];
@@ -10,7 +10,7 @@ export default function JoinVisualizer() {
   const [showSQL, setShowSQL] = useState(false);
 
   const config = {
-    left: residents, right: professions,
+    left: residents, right: societyEvents,
     lKey: "id", rKey: "resident_id",
     crossLeft: residents.slice(0, 4), crossRight: events,
     selfTable: residents, friendships,
@@ -19,6 +19,7 @@ export default function JoinVisualizer() {
 
   const result = useMemo(() => active ? executeJoin(active, config) : null, [active]);
   const info = active ? joinDescriptions[active] : null;
+  const story = active ? storyDescriptions[active] : null;
 
   // Determine which rows are in the join result
   const matchedLeftIds = useMemo(() => {
@@ -31,17 +32,16 @@ export default function JoinVisualizer() {
   }, [result]);
 
   // Decide which source tables to show based on join type
-  const showStandard = !active || ["INNER", "LEFT", "RIGHT", "FULL"].includes(active);
   const isCross = active === "CROSS";
   const isSelf = active === "SELF";
   const isNatural = active === "NATURAL";
 
-  const leftData  = isCross ? residents.slice(0, 4) : isNatural ? studentRecords : isSelf ? residents : residents;
-  const rightData = isCross ? events : isNatural ? gradeInfo : isSelf ? residents : professions;
+  const leftData  = isCross ? residents.slice(0, 4) : isNatural ? studentRecords : residents;
+  const rightData = isCross ? events : isNatural ? gradeInfo : isSelf ? residents : societyEvents;
   const leftName  = isCross ? "Residents (sample)" : isNatural ? "Student Records" : isSelf ? "Residents (A)" : "Residents";
-  const rightName = isCross ? "Events" : isNatural ? "Grade Info" : isSelf ? "Residents (B)" : "Professions";
+  const rightName = isCross ? "Events" : isNatural ? "Grade Info" : isSelf ? "Residents (B)" : "Society Events";
   const leftFields  = isCross ? ["name","emoji"] : isNatural ? ["student_name","score"] : ["name","emoji","flat"];
-  const rightFields = isCross ? ["event"] : isNatural ? ["grade","teacher"] : isSelf ? ["name","emoji","flat"] : ["profession","icon"];
+  const rightFields = isCross ? ["event"] : isNatural ? ["grade","teacher"] : isSelf ? ["name","emoji","flat"] : ["event_role","icon"];
   const leftKeyField = isCross || isSelf ? null : isNatural ? null : "id";
   const rightKeyField = isCross || isSelf ? null : isNatural ? null : "resident_id";
 
@@ -51,9 +51,10 @@ export default function JoinVisualizer() {
         {/* Header */}
         <motion.div initial={{ opacity: 0, y: 18 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
           className="text-center mb-10">
-          <h2 className="sec-head grad-text mb-2">🔬 JOIN Visualizer Simulator</h2>
+          <h2 className="sec-head grad-text mb-2">JOIN Visualizer</h2>
           <p className="text-slate-400 text-sm sm:text-base max-w-2xl mx-auto">
-            Gokuldham Society dataset 🏘️ — Click any JOIN to see rows animate, merge, vanish, or fill with NULLs!
+            Gokuldham Society — <span className="text-white font-medium">Residents</span> and their <span className="text-white font-medium">Event Roles</span>.
+            Click any JOIN type to see rows merge, vanish, or fill with NULLs.
           </p>
         </motion.div>
 
@@ -81,8 +82,8 @@ export default function JoinVisualizer() {
                     {info.name} <span className="text-xs text-slate-500 font-normal ml-1">— {info.tagline}</span>
                   </h3>
                   <p className="text-slate-300 text-sm mt-1">{info.shortDesc}</p>
-                  <p className="text-slate-500 text-xs mt-2 italic">🏘️ {info.realLife}</p>
-                  <p className="mt-2 text-xs font-bold" style={{ color: info.color }}>💡 Rule: {info.rule}</p>
+                  <p className="text-slate-500 text-xs mt-2 italic">{info.realLife}</p>
+                  <p className="mt-2 text-xs font-bold" style={{ color: info.color }}>Rule: {info.rule}</p>
                 </div>
                 <button onClick={() => setShowSQL(!showSQL)}
                   className="px-3 py-1 rounded-lg text-xs font-mono glass text-slate-400 hover:text-white transition-colors flex-shrink-0">
@@ -114,7 +115,7 @@ export default function JoinVisualizer() {
             </div>
             <div className="flex gap-2 px-3 py-1.5 text-[.6rem] font-mono text-slate-500 uppercase tracking-wider">
               {!isCross && !isSelf && !isNatural && <span className="w-6">ID</span>}
-              {leftFields.map(f => <span key={f} className="flex-1">{f}</span>)}
+              {leftFields.map(f => <span key={f} className="flex-1">{f.replace(/_/g, " ")}</span>)}
             </div>
             <div className="space-y-1.5 mt-1">
               {leftData.map((row, i) => {
@@ -145,7 +146,7 @@ export default function JoinVisualizer() {
             </div>
             <div className="flex gap-2 px-3 py-1.5 text-[.6rem] font-mono text-slate-500 uppercase tracking-wider">
               {rightKeyField && <span className="w-6">FK</span>}
-              {rightFields.map(f => <span key={f} className="flex-1">{f}</span>)}
+              {rightFields.map(f => <span key={f} className="flex-1">{f.replace(/_/g, " ")}</span>)}
             </div>
             <div className="space-y-1.5 mt-1">
               {rightData.map((row, i) => {
@@ -167,6 +168,23 @@ export default function JoinVisualizer() {
             </div>
           </motion.div>
         </div>
+
+        {/* Story context */}
+        <AnimatePresence>
+          {story && (
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
+              className="glass p-4 rounded-xl mb-5 max-w-3xl mx-auto">
+              <p className="text-sm text-slate-300 leading-relaxed">
+                <span className="font-bold" style={{ color: info?.color }}>Story:</span> {story.summary}
+              </p>
+              {story.nullStory && (
+                <p className="text-xs text-amber-400/80 mt-2 italic">
+                  NULL meaning: {story.nullStory}
+                </p>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Result Table */}
         <AnimatePresence>
@@ -191,49 +209,52 @@ export default function JoinVisualizer() {
               </div>
 
               <div className="space-y-1.5 max-h-[350px] overflow-y-auto pr-1">
-                {result.map((row, i) => (
-                  <motion.div key={i} initial={{ opacity: 0, x: -15 }} animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: i * .04, duration: .3 }}
-                    className={`drow ${row.type}`}>
-                    <div className="flex-1 flex gap-1.5 items-center flex-wrap">
-                      {row.left ? leftFields.map(f => (
-                        <span key={f} className="text-white text-[.72rem]">{row.left[f]}</span>
-                      )) : <span className="text-amber-400 text-[.7rem] font-mono italic">NULL</span>}
-                    </div>
-                    <div className="w-10 flex justify-center">
-                      {row.type === "matched" ? (
-                        <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }}
-                          className="w-6 h-6 rounded-full flex items-center justify-center text-[.65rem]"
-                          style={{ background: "rgba(34,197,94,.12)" }}>🔗</motion.span>
-                      ) : row.type === "self-ref" ? (
-                        <motion.span initial={{ scale: 0 }} animate={{ scale: [0,1.3,1] }}
-                          className="w-6 h-6 rounded-full flex items-center justify-center text-[.65rem]"
-                          style={{ background: "rgba(244,63,94,.12)" }}>🪞</motion.span>
-                      ) : row.type === "cross" ? (
-                        <span className="text-[.6rem] text-violet-400">×</span>
-                      ) : (
-                        <motion.span initial={{ scale: 0 }} animate={{ scale: [0,1.2,1] }}
-                          className="w-6 h-6 rounded-full flex items-center justify-center text-[.6rem]"
-                          style={{ background: "rgba(245,158,11,.1)" }}>∅</motion.span>
-                      )}
-                    </div>
-                    <div className="flex-1 flex gap-1.5 items-center justify-end flex-wrap text-right">
-                      {row.right ? rightFields.map(f => (
-                        <span key={f} className="text-white text-[.72rem]">{row.right[f]}</span>
-                      )) : <span className="text-amber-400 text-[.7rem] font-mono italic">NULL</span>}
-                      {row.right?.label && (
-                        <span className="text-[.6rem] text-slate-500 ml-1">({row.right.label})</span>
-                      )}
-                    </div>
-                  </motion.div>
-                ))}
+                {result.map((row, i) => {
+                  const rowStory = story?.perRow?.[row.left?.id];
+                  return (
+                    <motion.div key={i} initial={{ opacity: 0, x: -15 }} animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: i * .04, duration: .3 }}
+                      className={`drow ${row.type}`}>
+                      <div className="flex-1 flex gap-1.5 items-center flex-wrap">
+                        {row.left ? leftFields.map(f => (
+                          <span key={f} className="text-white text-[.72rem]">{row.left[f]}</span>
+                        )) : <span className="text-amber-400 text-[.7rem] font-mono italic">NULL</span>}
+                      </div>
+                      <div className="w-10 flex justify-center">
+                        {row.type === "matched" ? (
+                          <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }}
+                            className="w-6 h-6 rounded-full flex items-center justify-center text-[.65rem]"
+                            style={{ background: "rgba(34,197,94,.12)" }}>🔗</motion.span>
+                        ) : row.type === "self-ref" ? (
+                          <motion.span initial={{ scale: 0 }} animate={{ scale: [0,1.3,1] }}
+                            className="w-6 h-6 rounded-full flex items-center justify-center text-[.65rem]"
+                            style={{ background: "rgba(244,63,94,.12)" }}>🪞</motion.span>
+                        ) : row.type === "cross" ? (
+                          <span className="text-[.6rem] text-violet-400">×</span>
+                        ) : (
+                          <motion.span initial={{ scale: 0 }} animate={{ scale: [0,1.2,1] }}
+                            className="w-6 h-6 rounded-full flex items-center justify-center text-[.6rem]"
+                            style={{ background: "rgba(245,158,11,.1)" }}>∅</motion.span>
+                        )}
+                      </div>
+                      <div className="flex-1 flex gap-1.5 items-center justify-end flex-wrap text-right">
+                        {row.right ? rightFields.map(f => (
+                          <span key={f} className="text-white text-[.72rem]">{row.right[f]}</span>
+                        )) : <span className="text-amber-400 text-[.7rem] font-mono italic">NULL</span>}
+                        {row.right?.label && (
+                          <span className="text-[.6rem] text-slate-500 ml-1">({row.right.label})</span>
+                        )}
+                      </div>
+                    </motion.div>
+                  );
+                })}
               </div>
 
               <div className="flex justify-center gap-5 mt-4 text-[.65rem] text-slate-500">
-                <span>✅ Matched: <strong className="text-green-400">{result.filter(r => r.type === "matched").length}</strong></span>
-                <span>∅ NULL: <strong className="text-amber-400">{result.filter(r => r.type === "null-fill").length}</strong></span>
-                {result.some(r => r.type === "cross") && <span>✖️ Cross: <strong className="text-violet-400">{result.filter(r => r.type === "cross").length}</strong></span>}
-                <span>📊 Total: <strong className="text-white">{result.length}</strong></span>
+                <span>Matched: <strong className="text-green-400">{result.filter(r => r.type === "matched").length}</strong></span>
+                <span>NULL-fill: <strong className="text-amber-400">{result.filter(r => r.type === "null-fill").length}</strong></span>
+                {result.some(r => r.type === "cross") && <span>Cross: <strong className="text-violet-400">{result.filter(r => r.type === "cross").length}</strong></span>}
+                <span>Total: <strong className="text-white">{result.length}</strong></span>
               </div>
             </motion.div>
           )}

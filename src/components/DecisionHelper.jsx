@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { decisionTree, joinDescriptions } from "../data/datasets";
+import { decisionTree, joinDescriptions, decisionExplanations } from "../data/datasets";
 
 export default function DecisionHelper() {
   const [currentId, setCurrentId] = useState("q1");
@@ -9,6 +9,7 @@ export default function DecisionHelper() {
 
   const currentNode = decisionTree.find(n => n.id === currentId);
   const resultInfo = resultType ? joinDescriptions[resultType] : null;
+  const explanation = resultType ? decisionExplanations[resultType] : null;
 
   const handleOption = (opt) => {
     if (opt.result) {
@@ -43,9 +44,9 @@ export default function DecisionHelper() {
       <div className="max-w-2xl mx-auto">
         <motion.div initial={{ opacity: 0, y: 18 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
           className="text-center mb-10">
-          <h2 className="sec-head grad-text mb-2">🧭 JOIN Decision Helper</h2>
+          <h2 className="sec-head grad-text mb-2">JOIN Decision Helper</h2>
           <p className="text-slate-400 text-sm max-w-lg mx-auto">
-            Not sure which JOIN to use? Answer a few quick questions and we'll tell you! 🎯
+            Not sure which JOIN to use? Answer a few quick questions and we'll guide you to the right one.
           </p>
         </motion.div>
 
@@ -55,17 +56,19 @@ export default function DecisionHelper() {
               initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -40 }}
               className="glass p-6 sm:p-8 rounded-2xl">
 
-              {/* Progress dots */}
-              <div className="flex justify-center gap-2 mb-6">
+              {/* Step indicator */}
+              <div className="flex items-center justify-center gap-2 mb-6">
                 {decisionTree.map((_, i) => (
-                  <div key={i} className={`w-2.5 h-2.5 rounded-full transition-all ${
-                    i <= history.length ? "bg-indigo-500 scale-110" : "bg-slate-700"
+                  <div key={i} className={`h-1.5 rounded-full transition-all duration-300 ${
+                    i < history.length ? "w-8 bg-indigo-500" : i === history.length ? "w-8 bg-indigo-400 animate-pulse" : "w-4 bg-slate-700"
                   }`} />
                 ))}
               </div>
 
-              <div className="flex items-start gap-3 mb-6">
-                <span className="text-3xl">🤔</span>
+              <div className="mb-6">
+                <p className="text-[.65rem] text-indigo-400 font-semibold uppercase tracking-widest mb-2">
+                  Step {history.length + 1} of {decisionTree.length}
+                </p>
                 <h3 className="font-['Outfit'] font-bold text-lg text-white leading-relaxed">
                   {currentNode?.question}
                 </h3>
@@ -101,13 +104,20 @@ export default function DecisionHelper() {
                 className="text-5xl mb-4">{resultInfo.icon}</motion.div>
 
               <h3 className="font-['Outfit'] font-black text-2xl mb-1" style={{ color: resultInfo.color }}>
-                Use {resultInfo.name}!
+                Use {resultInfo.name}
               </h3>
               <p className="text-slate-400 text-sm italic mb-4">{resultInfo.tagline}</p>
 
+              {/* Explanation of why this join was recommended */}
               <div className="glass p-4 rounded-xl text-left mb-4">
+                <p className="text-xs text-indigo-400 font-semibold uppercase tracking-wider mb-2">Why this join?</p>
+                <p className="text-sm text-slate-300 leading-relaxed">{explanation}</p>
+              </div>
+
+              <div className="glass p-4 rounded-xl text-left mb-4">
+                <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider mb-2">How it works</p>
                 <p className="text-sm text-slate-300 mb-2">{resultInfo.shortDesc}</p>
-                <p className="text-xs text-slate-500 italic">🏘️ {resultInfo.realLife}</p>
+                <p className="text-xs text-slate-500 italic">{resultInfo.realLife}</p>
               </div>
 
               <div className="flex items-center justify-center gap-3 text-sm font-bold mb-6"
@@ -120,7 +130,7 @@ export default function DecisionHelper() {
               <div className="flex gap-3 justify-center">
                 <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: .95 }}
                   onClick={reset} className="glow-btn px-6 py-2.5 text-sm">
-                  🔄 Try Again
+                  Try Again
                 </motion.button>
                 <button onClick={goBack}
                   className="px-5 py-2.5 rounded-xl text-sm glass text-slate-400 hover:text-white transition-colors font-semibold">

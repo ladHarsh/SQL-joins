@@ -58,9 +58,9 @@ export default function JoinChallenge() {
       <div className="max-w-3xl mx-auto">
         <motion.div initial={{ opacity: 0, y: 18 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
           className="text-center mb-10">
-          <h2 className="sec-head grad-warm mb-2">⚔️ JOIN Challenge</h2>
+          <h2 className="sec-head grad-warm mb-2">JOIN Challenge</h2>
           <p className="text-slate-400 text-sm max-w-lg mx-auto">
-            Test your SQL JOIN skills with TMKOC & Gen-Z scenarios. Let's see if you're a JOIN Pro! 💪
+            Test your SQL JOIN skills with TMKOC and Gen-Z scenarios. See how well you understand each join type.
           </p>
         </motion.div>
 
