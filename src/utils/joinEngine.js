@@ -1,5 +1,5 @@
 // ====================================================
-//  JOIN ENGINE — All 7+ Join Types with Full Logic
+//  JOIN ENGINE — All 9 Join Types with Full Logic
 // ====================================================
 
 /** INNER JOIN: Only matching rows */
@@ -66,6 +66,30 @@ export function fullJoin(left, right, lKey, rKey) {
   return results;
 }
 
+/** LEFT EXCLUSIVE JOIN: Only left rows with NO match in right */
+export function leftExclusiveJoin(left, right, lKey, rKey) {
+  const results = [];
+  left.forEach(l => {
+    const hasMatch = right.some(r => r[rKey] === l[lKey]);
+    if (!hasMatch) {
+      results.push({ left: { ...l }, right: null, type: "exclusive" });
+    }
+  });
+  return results;
+}
+
+/** RIGHT EXCLUSIVE JOIN: Only right rows with NO match in left */
+export function rightExclusiveJoin(left, right, lKey, rKey) {
+  const results = [];
+  right.forEach(r => {
+    const hasMatch = left.some(l => l[lKey] === r[rKey]);
+    if (!hasMatch) {
+      results.push({ left: null, right: { ...r }, type: "exclusive" });
+    }
+  });
+  return results;
+}
+
 /** CROSS JOIN: Cartesian product */
 export function crossJoin(left, right) {
   const results = [];
@@ -98,7 +122,6 @@ export function selfJoin(residents, friendships) {
 
 /** NATURAL JOIN: Auto-match on shared column names */
 export function naturalJoin(left, right) {
-  // Find shared column names
   const leftKeys = Object.keys(left[0] || {});
   const rightKeys = Object.keys(right[0] || {});
   const sharedKeys = leftKeys.filter(k => rightKeys.includes(k));
@@ -121,13 +144,15 @@ export function naturalJoin(left, right) {
 /** Master executor */
 export function executeJoin(type, config) {
   switch (type) {
-    case "INNER":   return innerJoin(config.left, config.right, config.lKey, config.rKey);
-    case "LEFT":    return leftJoin(config.left, config.right, config.lKey, config.rKey);
-    case "RIGHT":   return rightJoin(config.left, config.right, config.lKey, config.rKey);
-    case "FULL":    return fullJoin(config.left, config.right, config.lKey, config.rKey);
-    case "CROSS":   return crossJoin(config.crossLeft || config.left, config.crossRight || config.right);
-    case "SELF":    return selfJoin(config.selfTable, config.friendships);
-    case "NATURAL": return naturalJoin(config.natLeft, config.natRight);
-    default:        return [];
+    case "INNER":    return innerJoin(config.left, config.right, config.lKey, config.rKey);
+    case "LEFT":     return leftJoin(config.left, config.right, config.lKey, config.rKey);
+    case "RIGHT":    return rightJoin(config.left, config.right, config.lKey, config.rKey);
+    case "FULL":     return fullJoin(config.left, config.right, config.lKey, config.rKey);
+    case "LEFT_EX":  return leftExclusiveJoin(config.left, config.right, config.lKey, config.rKey);
+    case "RIGHT_EX": return rightExclusiveJoin(config.left, config.right, config.lKey, config.rKey);
+    case "CROSS":    return crossJoin(config.crossLeft || config.left, config.crossRight || config.right);
+    case "SELF":     return selfJoin(config.selfTable, config.friendships);
+    case "NATURAL":  return naturalJoin(config.natLeft, config.natRight);
+    default:         return [];
   }
 }

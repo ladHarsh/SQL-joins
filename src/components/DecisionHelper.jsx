@@ -2,6 +2,32 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { decisionTree, joinDescriptions, decisionExplanations } from "../data/datasets";
 
+// Inline Venn for decision result
+function MiniVenn({ type }) {
+  const info = joinDescriptions[type];
+  const c = info?.color || "#6366f1";
+  const cfg = {
+    INNER:    { l: false, o: true,  r: false },
+    LEFT:     { l: true,  o: true,  r: false },
+    RIGHT:    { l: false, o: true,  r: true  },
+    FULL:     { l: true,  o: true,  r: true  },
+    LEFT_EX:  { l: true,  o: false, r: false },
+    RIGHT_EX: { l: false, o: false, r: true  },
+    CROSS:    { l: true,  o: true,  r: true  },
+    SELF:     { l: true,  o: true,  r: false },
+    NATURAL:  { l: false, o: true,  r: false },
+  }[type] || {};
+  return (
+    <svg viewBox="0 0 120 80" className="w-20 mx-auto" xmlns="http://www.w3.org/2000/svg">
+      <defs><clipPath id={`mv-${type}`}><circle cx="43" cy="40" r="28" /></clipPath></defs>
+      <circle cx="43" cy="40" r="28" fill={cfg.l ? c : "transparent"} fillOpacity={cfg.l ? .35 : 0} stroke={c} strokeWidth="1.5" strokeOpacity=".4" />
+      <circle cx="77" cy="40" r="28" fill={cfg.r ? c : "transparent"} fillOpacity={cfg.r ? .35 : 0} stroke={c} strokeWidth="1.5" strokeOpacity=".4" />
+      <circle cx="77" cy="40" r="28" clipPath={`url(#mv-${type})`} fill={cfg.o ? c : "#0f172a"} fillOpacity={cfg.o ? .6 : .8} />
+      {type === "LEFT_EX" && <circle cx="77" cy="40" r="28" clipPath={`url(#mv-${type})`} fill="#0f172a" fillOpacity=".85" />}
+    </svg>
+  );
+}
+
 export default function DecisionHelper() {
   const [currentId, setCurrentId] = useState("q1");
   const [resultType, setResultType] = useState(null);
@@ -43,10 +69,10 @@ export default function DecisionHelper() {
     <section id="decision" className="py-16 px-4">
       <div className="max-w-2xl mx-auto">
         <motion.div initial={{ opacity: 0, y: 18 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
-          className="text-center mb-10">
-          <h2 className="sec-head grad-text mb-2">JOIN Decision Helper</h2>
+          className="text-center mb-8">
+          <h2 className="sec-head grad-text mb-2">Which JOIN Do You Need?</h2>
           <p className="text-slate-400 text-sm max-w-lg mx-auto">
-            Not sure which JOIN to use? Answer a few quick questions and we'll guide you to the right one.
+            Answer one simple question at a time. We'll recommend the exact JOIN type you need.
           </p>
         </motion.div>
 
@@ -56,25 +82,25 @@ export default function DecisionHelper() {
               initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -40 }}
               className="glass p-6 sm:p-8 rounded-2xl">
 
-              {/* Step indicator */}
-              <div className="flex items-center justify-center gap-2 mb-6">
+              {/* Progress dots */}
+              <div className="flex items-center justify-center gap-2 mb-5">
                 {decisionTree.map((_, i) => (
                   <div key={i} className={`h-1.5 rounded-full transition-all duration-300 ${
-                    i < history.length ? "w-8 bg-indigo-500" : i === history.length ? "w-8 bg-indigo-400 animate-pulse" : "w-4 bg-slate-700"
+                    i < history.length ? "w-6 bg-indigo-500" : i === history.length ? "w-6 bg-indigo-400 animate-pulse" : "w-3 bg-slate-700"
                   }`} />
                 ))}
               </div>
 
-              <div className="mb-6">
-                <p className="text-[.65rem] text-indigo-400 font-semibold uppercase tracking-widest mb-2">
-                  Step {history.length + 1} of {decisionTree.length}
+              <div className="mb-5">
+                <p className="text-[.6rem] text-indigo-400 font-semibold uppercase tracking-widest mb-1.5">
+                  Question {history.length + 1}
                 </p>
                 <h3 className="font-['Outfit'] font-bold text-lg text-white leading-relaxed">
                   {currentNode?.question}
                 </h3>
               </div>
 
-              <div className="space-y-3">
+              <div className="space-y-2.5">
                 {currentNode?.options.map((opt, i) => (
                   <motion.button key={i}
                     whileHover={{ scale: 1.01, x: 4 }} whileTap={{ scale: .98 }}
@@ -100,27 +126,31 @@ export default function DecisionHelper() {
             <motion.div key="result"
               initial={{ opacity: 0, scale: .92 }} animate={{ opacity: 1, scale: 1 }}
               className="glass p-6 sm:p-8 rounded-2xl text-center">
+
+              {/* Venn for result */}
+              <MiniVenn type={resultType} />
+
               <motion.div initial={{ scale: 0 }} animate={{ scale: [0, 1.3, 1] }} transition={{ duration: .5 }}
-                className="text-5xl mb-4">{resultInfo.icon}</motion.div>
+                className="text-4xl mb-2 mt-2">{resultInfo.icon}</motion.div>
 
               <h3 className="font-['Outfit'] font-black text-2xl mb-1" style={{ color: resultInfo.color }}>
                 Use {resultInfo.name}
               </h3>
               <p className="text-slate-400 text-sm italic mb-4">{resultInfo.tagline}</p>
 
-              {/* Explanation of why this join was recommended */}
               <div className="glass p-4 rounded-xl text-left mb-4">
                 <p className="text-xs text-indigo-400 font-semibold uppercase tracking-wider mb-2">Why this join?</p>
                 <p className="text-sm text-slate-300 leading-relaxed">{explanation}</p>
               </div>
 
               <div className="glass p-4 rounded-xl text-left mb-4">
-                <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider mb-2">How it works</p>
-                <p className="text-sm text-slate-300 mb-2">{resultInfo.shortDesc}</p>
-                <p className="text-xs text-slate-500 italic">{resultInfo.realLife}</p>
+                <p className="text-[.6rem] font-mono text-slate-600 uppercase tracking-wider mb-2">SQL Pattern</p>
+                <pre className="bg-[#020617] rounded-lg p-3 text-[.68rem] font-mono text-cyan-300 overflow-x-auto leading-relaxed whitespace-pre-wrap">
+                  {resultInfo.sql}
+                </pre>
               </div>
 
-              <div className="flex items-center justify-center gap-3 text-sm font-bold mb-6"
+              <div className="flex items-center justify-center gap-3 text-sm font-bold mb-5"
                 style={{ color: resultInfo.color }}>
                 <span className="px-3 py-1.5 rounded-lg text-xs" style={{ background: `${resultInfo.color}15`, border: `1px solid ${resultInfo.color}30` }}>
                   {resultInfo.rule}

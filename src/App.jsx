@@ -6,7 +6,7 @@ import LandingHero from "./components/LandingHero";
 import JoinVisualizer from "./components/JoinVisualizer";
 import DecisionHelper from "./components/DecisionHelper";
 import JoinChallenge from "./components/JoinChallenge";
-import CheatSheet from "./components/CheatSheet";
+import RealWorldExamples from "./components/RealWorldExamples";
 import AskAI from "./components/AskAI";
 import Footer from "./components/Footer";
 
@@ -16,10 +16,10 @@ export default function App() {
 
   const refs = {
     visualizer: useRef(null),
-    decision: useRef(null),
-    quiz: useRef(null),
-    cheatsheet: useRef(null),
-    ai: useRef(null),
+    decision:   useRef(null),
+    quiz:       useRef(null),
+    examples:   useRef(null),
+    ai:         useRef(null),
   };
 
   const handleStart = () => {
@@ -68,7 +68,7 @@ export default function App() {
               {divider}
               <div ref={refs.quiz}><JoinChallenge /></div>
               {divider}
-              <div ref={refs.cheatsheet}><CheatSheet /></div>
+              <div ref={refs.examples}><RealWorldExamples /></div>
               {divider}
               <div ref={refs.ai}><AskAI /></div>
 
