@@ -153,10 +153,6 @@ export default function CheatSheet() {
               <p className="text-xs font-bold text-rose-400 mb-1.5">Same table relationships?</p>
               <p className="text-sm text-white font-mono">→ SELF JOIN</p>
             </div>
-            <div className="glass p-3 rounded-xl">
-              <p className="text-xs font-bold text-teal-400 mb-1.5">Shared column auto-match?</p>
-              <p className="text-sm text-white font-mono">→ NATURAL JOIN</p>
-            </div>
           </div>
         </motion.div>
       </div>

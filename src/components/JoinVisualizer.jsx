@@ -2,26 +2,21 @@ import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   residents, societyEvents, events, friendships,
-  studentRecords, gradeInfo,
   joinDescriptions, storyDescriptions,
 } from "../data/datasets";
 import { executeJoin } from "../utils/joinEngine";
 
-const TYPES = ["INNER", "LEFT", "RIGHT", "FULL", "LEFT_EX", "RIGHT_EX", "CROSS", "SELF", "NATURAL"];
+const TYPES = ["INNER", "LEFT", "RIGHT", "FULL", "CROSS", "SELF"];
 
 // ─── Venn Diagram SVG ──────────────────────────────────────────────────────
 function VennDiagram({ type }) {
-  // Venn highlight configs: which areas to fill
   const config = {
-    INNER:    { leftOnly: false, overlap: true,  rightOnly: false },
-    LEFT:     { leftOnly: true,  overlap: true,  rightOnly: false },
-    RIGHT:    { leftOnly: false, overlap: true,  rightOnly: true  },
-    FULL:     { leftOnly: true,  overlap: true,  rightOnly: true  },
-    LEFT_EX:  { leftOnly: true,  overlap: false, rightOnly: false },
-    RIGHT_EX: { leftOnly: false, overlap: false, rightOnly: true  },
-    CROSS:    { leftOnly: true,  overlap: true,  rightOnly: true  },
-    SELF:     { leftOnly: true,  overlap: true,  rightOnly: false },
-    NATURAL:  { leftOnly: false, overlap: true,  rightOnly: false },
+    INNER: { leftOnly: false, overlap: true,  rightOnly: false },
+    LEFT:  { leftOnly: true,  overlap: true,  rightOnly: false },
+    RIGHT: { leftOnly: false, overlap: true,  rightOnly: true  },
+    FULL:  { leftOnly: true,  overlap: true,  rightOnly: true  },
+    CROSS: { leftOnly: true,  overlap: true,  rightOnly: true  },
+    SELF:  { leftOnly: true,  overlap: true,  rightOnly: false },
   }[type] || {};
 
   const info = joinDescriptions[type];
@@ -31,44 +26,28 @@ function VennDiagram({ type }) {
     <div className="flex flex-col items-center">
       <svg viewBox="0 0 200 120" className="w-full max-w-[200px]" xmlns="http://www.w3.org/2000/svg">
         <defs>
-          <clipPath id="clipLeft">
-            <circle cx="72" cy="60" r="45" />
-          </clipPath>
-          <clipPath id="clipRight">
-            <circle cx="128" cy="60" r="45" />
-          </clipPath>
           <clipPath id="clipOverlap">
             <circle cx="72" cy="60" r="45" />
           </clipPath>
         </defs>
 
-        {/* Left only area */}
+        {/* Left circle */}
         <circle cx="72" cy="60" r="45"
           fill={config.leftOnly ? activeColor : "transparent"}
           fillOpacity={config.leftOnly ? 0.35 : 0}
           stroke={activeColor} strokeWidth="2" strokeOpacity={0.5} />
 
-        {/* Right only area */}
+        {/* Right circle */}
         <circle cx="128" cy="60" r="45"
           fill={config.rightOnly ? activeColor : "transparent"}
           fillOpacity={config.rightOnly ? 0.35 : 0}
           stroke={activeColor} strokeWidth="2" strokeOpacity={0.5} />
 
-        {/* Overlap area — drawn by clipping left circle to right circle's region */}
+        {/* Overlap area */}
         <circle cx="128" cy="60" r="45"
           clipPath="url(#clipOverlap)"
           fill={config.overlap ? activeColor : (config.leftOnly && !config.rightOnly ? "#0f172a" : "transparent")}
           fillOpacity={config.overlap ? 0.6 : (config.leftOnly && !config.rightOnly ? 0.8 : 0)} />
-
-        {/* For exclusive joins: punch out the overlap from the filled circle */}
-        {type === "LEFT_EX" && (
-          <circle cx="128" cy="60" r="45" clipPath="url(#clipOverlap)"
-            fill="#0f172a" fillOpacity="0.85" />
-        )}
-        {type === "RIGHT_EX" && (
-          <circle cx="72" cy="60" r="45" clipPath="url(#clipRight)"
-            fill="#0f172a" fillOpacity="0.85" />
-        )}
 
         {/* Labels */}
         <text x="52" y="62" textAnchor="middle" fontSize="9" fill="#94a3b8" fontFamily="monospace">L</text>
@@ -81,16 +60,14 @@ function VennDiagram({ type }) {
 
 // ─── Table config by join type ──────────────────────────────────────────────
 function getTableConfig(type) {
-  if (type === "CROSS")   return { left: residents.slice(0, 4), right: events, leftName: "Residents", rightName: "Events", lFields: ["name", "role"], rFields: ["event"] };
-  if (type === "SELF")    return { left: residents.slice(0, 5), right: residents.slice(0, 5), leftName: "Residents (A)", rightName: "Residents (B)", lFields: ["name", "flat"], rFields: ["name", "flat"] };
-  if (type === "NATURAL") return { left: studentRecords, right: gradeInfo, leftName: "Student Records", rightName: "Grade Info", lFields: ["student_name", "grade", "score"], rFields: ["grade", "teacher"] };
+  if (type === "CROSS") return { left: residents.slice(0, 4), right: events, leftName: "Residents", rightName: "Events", lFields: ["name", "role"], rFields: ["event"] };
+  if (type === "SELF")  return { left: residents.slice(0, 5), right: residents.slice(0, 5), leftName: "Residents (A)", rightName: "Residents (B)", lFields: ["name", "flat"], rFields: ["name", "flat"] };
   return { left: residents, right: societyEvents, leftName: "Residents", rightName: "SocietyActivities", lFields: ["name", "flat", "role"], rFields: ["activity"] };
 }
 
 function getJoinConfig(type) {
-  if (type === "CROSS")    return { left: residents.slice(0, 4), right: events, lKey: "id", rKey: null };
-  if (type === "SELF")     return { selfTable: residents, friendships };
-  if (type === "NATURAL")  return { natLeft: studentRecords, natRight: gradeInfo };
+  if (type === "CROSS") return { left: residents.slice(0, 4), right: events, lKey: "id", rKey: null };
+  if (type === "SELF")  return { selfTable: residents, friendships };
   return { left: residents, right: societyEvents, lKey: "id", rKey: "resident_id" };
 }
 
@@ -128,7 +105,7 @@ function SQLResultTable({ result, tconf, info }) {
               transition={{ delay: i * .025, duration: .2 }}
               className={`border-b border-slate-800/30 transition-colors ${
                 row.type === "matched" ? "hover:bg-green-500/5" :
-                row.type === "null-fill" || row.type === "exclusive" ? "hover:bg-amber-500/5" :
+                row.type === "null-fill" ? "hover:bg-amber-500/5" :
                 row.type === "cross" ? "hover:bg-violet-500/5" :
                 "hover:bg-slate-800/30"
               }`}>
@@ -142,7 +119,7 @@ function SQLResultTable({ result, tconf, info }) {
               ))}
               <td className="px-1 py-1.5 text-center">
                 {row.type === "matched" && <span className="text-green-400">🔗</span>}
-                {(row.type === "null-fill" || row.type === "exclusive") && <span className="text-amber-400">∅</span>}
+                {row.type === "null-fill" && <span className="text-amber-400">∅</span>}
                 {row.type === "cross" && <span className="text-violet-400">×</span>}
                 {row.type === "self-ref" && <span>🪞</span>}
               </td>
@@ -184,22 +161,16 @@ export default function JoinVisualizer() {
 
   function isLeftExcluded(row) {
     if (!active) return false;
-    if (["INNER", "RIGHT", "RIGHT_EX"].includes(active)) return !matchedLeftIds.has(row.id);
+    if (["INNER", "RIGHT"].includes(active)) return !matchedLeftIds.has(row.id);
     return false;
   }
   function isRightExcluded(row) {
     if (!active) return false;
-    if (["INNER", "LEFT", "LEFT_EX"].includes(active)) return !matchedRightIds.has(row.id ?? row.resident_id);
+    if (["INNER", "LEFT"].includes(active)) return !matchedRightIds.has(row.id ?? row.resident_id);
     return false;
   }
   function isLeftMatched(row)  { return active && matchedLeftIds.has(row.id); }
   function isRightMatched(row) { return active && matchedRightIds.has(row.id ?? row.resident_id); }
-
-  // For exclusive joins, highlight the "kept" rows
-  function isLeftKept(row) {
-    if (active === "LEFT_EX") return !matchedLeftIds.has(row.id) === false; // opposite logic
-    return false;
-  }
 
   return (
     <section id="visualizer" className="py-10 px-4">
@@ -278,13 +249,11 @@ export default function JoinVisualizer() {
               {tconf.left.map((row, i) => {
                 const excl = isLeftExcluded(row);
                 const match = isLeftMatched(row);
-                const isExclKept = active === "LEFT_EX" && !match;
                 return (
                   <motion.div key={row.id || i}
                     animate={{ opacity: excl ? .25 : 1, scale: excl ? .97 : 1 }}
                     transition={{ duration: .3, delay: i * .04 }}
-                    className={`drow ${active ? (excl ? "excluded" : match ? "matched" : isExclKept ? "exclusive-kept" : "glass") : "glass"}`}
-                    style={isExclKept ? { borderColor: `${info?.color}50`, background: `${info?.color}08` } : {}}>
+                    className={`drow ${active ? (excl ? "excluded" : match ? "matched" : "glass") : "glass"}`}>
                     <span className="w-7 text-[.65rem] font-mono text-slate-500">{row.id ?? i+1}</span>
                     {tconf.lFields.map(f => (
                       <span key={f} className={`${f === 'role' ? 'flex-[2]' : 'flex-1'} text-xs text-white ${f === 'role' ? 'whitespace-normal leading-tight' : 'truncate'}`} title={String(row[f] ?? "")}>
@@ -315,13 +284,11 @@ export default function JoinVisualizer() {
                 const rId = row.id ?? row.resident_id ?? i;
                 const excl = isRightExcluded(row);
                 const match = isRightMatched(row);
-                const isExclKept = active === "RIGHT_EX" && !match;
                 return (
                   <motion.div key={rId}
                     animate={{ opacity: excl ? .25 : 1, scale: excl ? .97 : 1 }}
                     transition={{ duration: .3, delay: i * .04 }}
-                    className={`drow ${active ? (excl ? "excluded" : match ? "matched" : isExclKept ? "exclusive-kept" : "glass") : "glass"}`}
-                    style={isExclKept ? { borderColor: `${info?.color}50`, background: `${info?.color}08` } : {}}>
+                    className={`drow ${active ? (excl ? "excluded" : match ? "matched" : "glass") : "glass"}`}>
                     <span className="w-7 text-[.65rem] font-mono text-pink-400/70">{row.resident_id ?? ""}</span>
                     {tconf.rFields.map(f => (
                       <span key={f} className="flex-1 text-xs text-white whitespace-normal leading-tight">
@@ -376,7 +343,6 @@ export default function JoinVisualizer() {
                   <div className="flex flex-wrap gap-3 mt-2 text-[.6rem] text-slate-500">
                     <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-sm bg-green-500/40 border border-green-500/50 inline-block" /> Matched</span>
                     <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-sm bg-amber-500/20 border border-amber-500/40 border-dashed inline-block" /> NULL-fill</span>
-                    {result.some(r => r.type === "exclusive") && <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-sm bg-emerald-500/20 border border-emerald-500/40 inline-block" /> Exclusive</span>}
                     {result.some(r => r.type === "cross") && <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-sm bg-violet-500/20 border border-violet-500/40 inline-block" /> Cartesian</span>}
                   </div>
                 </div>
@@ -391,7 +357,6 @@ export default function JoinVisualizer() {
               <div className="mt-3 pt-3 border-t border-slate-800/60 flex flex-wrap gap-4 text-[.65rem] text-slate-500">
                 <span>Matched <strong className="text-green-400">{result.filter(r => r.type === "matched").length}</strong></span>
                 <span>NULL-fill <strong className="text-amber-400">{result.filter(r => r.type === "null-fill").length}</strong></span>
-                {result.some(r => r.type === "exclusive") && <span>Exclusive <strong className="text-emerald-400">{result.filter(r => r.type === "exclusive").length}</strong></span>}
                 {result.some(r => r.type === "self-ref") && <span>Self-ref <strong className="text-rose-400">{result.filter(r => r.type === "self-ref").length}</strong></span>}
                 <span>Total <strong className="text-white">{result.length}</strong></span>
               </div>

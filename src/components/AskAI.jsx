@@ -9,7 +9,6 @@ const fallbacks = {
   "full join": "FULL OUTER JOIN keeps ALL rows from BOTH tables. No row is left behind — NULLs fill the gaps on either side. It's the complete picture where nothing gets excluded.",
   "cross join": "CROSS JOIN produces the Cartesian product — every row from A paired with every row from B. 7 rows × 3 rows = 21 results. No condition needed, just pure combination.",
   "self join": "SELF JOIN is when a table joins with itself, using aliases (like A and B). It's useful for finding relationships within the same data, such as manager-employee hierarchies.",
-  "natural join": "NATURAL JOIN automatically matches columns with the same name in both tables. No ON clause needed — SQL figures it out. Just make sure the shared column names are intentional.",
   "null": "NULL in JOINs means 'no matching data on this side'. When LEFT JOIN shows a resident without a role, the role column becomes NULL — not zero, not blank, just 'no data available'.",
   "difference": "INNER = only matches. LEFT = all left + matches. RIGHT = all right + matches. FULL = everything. CROSS = all combos. SELF = same table. Each serves a different purpose.",
   "when": "Use INNER when you need only matching data. LEFT when the left table is your priority. FULL when you can't afford to lose ANY row. CROSS for all combinations. SELF for same-table relationships.",
@@ -24,7 +23,6 @@ function findFallback(q) {
   if (l.includes("full") || l.includes("outer")) return fallbacks["full join"];
   if (l.includes("cross")) return fallbacks["cross join"];
   if (l.includes("self")) return fallbacks["self join"];
-  if (l.includes("natural")) return fallbacks["natural join"];
   if (l.includes("null")) return fallbacks["null"];
   if (l.includes("diff") || l.includes("vs") || l.includes("compare")) return fallbacks["difference"];
   if (l.includes("when") || l.includes("use") || l.includes("should")) return fallbacks["when"];

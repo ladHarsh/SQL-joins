@@ -96,11 +96,10 @@ export default function RealWorldExamples() {
                 <span className="text-violet-400">FROM</span> {ex.leftTable}{" "}<br />
                 <span style={{ color: ex.color }} className="font-bold">{ex.joinType}</span>{" "}
                 {ex.rightTable}{" "}<br />
-                {ex.joinType !== "CROSS JOIN" && ex.joinType !== "NATURAL JOIN" && (
+                {ex.joinType !== "CROSS JOIN" && ex.joinType !== "SELF JOIN" && (
                   <><span className="text-violet-400">ON</span> <span className="text-slate-400">id = id;</span></>
                 )}
                 {ex.joinType === "CROSS JOIN" && <span className="text-slate-500">-- No condition needed</span>}
-                {ex.joinType === "NATURAL JOIN" && <span className="text-slate-500">-- Auto-matches columns</span>}
               </div>
 
               {/* Mini diagram */}
@@ -132,7 +131,6 @@ export default function RealWorldExamples() {
                 { type: "FULL",    returns: "All rows from both tables",      nulls: "Both sides",   cond: "ON clause required" },
                 { type: "CROSS",   returns: "Every row × every row (A×B)",    nulls: "Never",         cond: "No condition" },
                 { type: "SELF",    returns: "Rows from same table matched",   nulls: "If unmatched",  cond: "Aliases A & B" },
-                { type: "NATURAL", returns: "Shared-column auto-match",       nulls: "If unmatched",  cond: "Auto-detect" },
               ].map(row => {
                 const desc = joinDescriptions[row.type];
                 return (

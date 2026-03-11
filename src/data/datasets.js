@@ -48,16 +48,6 @@ export const friendships = [
   { resident_id: 6, best_friend_id: 4, label: "Party + discipline combo" },
 ];
 
-// ─── NATURAL JOIN DATASET ────────────────────────────────────────────────────
-export const studentRecords = [
-  { student_name: "Tapu",  grade: "10th", score: 45 },
-  { student_name: "Goli",  grade: "10th", score: 72 },
-  { student_name: "Sonu",  grade: "10th", score: 95 },
-];
-export const gradeInfo = [
-  { grade: "10th", teacher: "Bhide Sir", subject: "Maths" },
-  { grade: "11th", teacher: "New Teacher", subject: "Physics" },
-];
 
 
 // ====================================================
@@ -87,18 +77,6 @@ export const storyDescriptions = {
   SELF: {
     summary: "The residents table joins with itself to find best-friend relationships. Popatlal's best friend is... himself. Classic Popatlal.",
     nullStory: null,
-  },
-  NATURAL: {
-    summary: "Both tables share a 'grade' column. SQL automatically detected and matched on it — no ON clause needed! All 10th graders link to Bhide Sir's Maths class.",
-    nullStory: null,
-  },
-  LEFT_EX: {
-    summary: "Only residents who have NO matching activity at all. Daya and Sodhi are the only ones — they exist in the society but volunteered for nothing!",
-    nullStory: "These rows have NULL on the right because that's the whole point — we're selecting ONLY the unmatched left rows.",
-  },
-  RIGHT_EX: {
-    summary: "Only activities with NO matching resident. The 'Tapu Sena Annual Talent Show' (resident_id=8) is the only orphan activity — nobody in the residents table has that ID!",
-    nullStory: "These rows have NULL on the left because the activity has no corresponding resident.",
   },
 };
 
@@ -184,46 +162,6 @@ JOIN friendships f ON a.id = f.resident_id
 JOIN residents b ON f.best_friend_id = b.id;`,
     rule: "Same table, aliased as A & B",
   },
-  NATURAL: {
-    name: "NATURAL JOIN",
-    icon: "🌿",
-    color: "#14b8a6",
-    tagline: "Auto-match common columns",
-    shortDesc: "Automatically joins on columns with the SAME name in both tables. No ON clause needed.",
-    realLife: "Student records and grade info both have a 'grade' column — SQL auto-matches them without you writing ON!",
-    sql: `SELECT *
-FROM student_records
-NATURAL JOIN grade_info;`,
-    rule: "Auto-match on shared column names",
-  },
-  LEFT_EX: {
-    name: "LEFT EXCLUSIVE",
-    icon: "🚫⬅️",
-    color: "#10b981",
-    tagline: "Only unmatched left rows",
-    shortDesc: "Returns rows from the left table that have NO match in the right table. It's a LEFT JOIN filtered with WHERE right.key IS NULL.",
-    realLife: "Residents who didn't volunteer for ANY activity. Only Daya and Sodhi — everyone else has a role!",
-    sql: `SELECT r.name, r.role, s.activity
-FROM residents r
-LEFT JOIN society_events s
-ON r.id = s.resident_id
-WHERE s.resident_id IS NULL;`,
-    rule: "LEFT JOIN + WHERE right_key IS NULL",
-  },
-  RIGHT_EX: {
-    name: "RIGHT EXCLUSIVE",
-    icon: "➡️🚫",
-    color: "#f97316",
-    tagline: "Only unmatched right rows",
-    shortDesc: "Returns rows from the right table that have NO match in the left table. It's a RIGHT JOIN filtered with WHERE left.key IS NULL.",
-    realLife: "Activities with no resident assigned. Only the 'Tapu Sena Talent Show' — a ghost event with resident_id = 8!",
-    sql: `SELECT r.name, s.activity
-FROM residents r
-RIGHT JOIN society_events s
-ON r.id = s.resident_id
-WHERE r.id IS NULL;`,
-    rule: "RIGHT JOIN + WHERE left_key IS NULL",
-  },
 };
 
 
@@ -263,7 +201,7 @@ export const quizQuestions = [
     emoji: "🎮",
     scenario: "A gaming platform lists all teams — even teams that currently have zero players assigned. Teams with no players should show NULL for the player name.",
     question: "Which JOIN keeps ALL teams visible regardless of player assignment?",
-    options: ["INNER JOIN", "LEFT JOIN", "RIGHT JOIN", "NATURAL JOIN"],
+    options: ["INNER JOIN", "LEFT JOIN", "RIGHT JOIN", "FULL OUTER JOIN"],
     correct: 2,
     explanation: "RIGHT JOIN — all rows from the right table (Teams) are kept. If no players match, the player column shows NULL.",
   },
@@ -287,9 +225,8 @@ export const decisionTree = [
     id: "q1",
     question: "What do you need from the two tables?",
     options: [
-      { label: "Only records that match in BOTH tables", next: "q2" },
-      { label: "ALL records from one specific table (+ matches)", next: "q3" },
-      { label: "Records that exist in only ONE table (no match)", next: "q4" },
+      { label: "Only records that match in BOTH tables", result: "INNER" },
+      { label: "ALL records from one specific table", next: "q2" },
       { label: "ALL records from BOTH tables combined", result: "FULL" },
       { label: "Every possible row combination", result: "CROSS" },
       { label: "Relationships within the SAME table", result: "SELF" },
@@ -297,26 +234,10 @@ export const decisionTree = [
   },
   {
     id: "q2",
-    question: "How should the matching work?",
-    options: [
-      { label: "I'll specify exact columns to match with ON", result: "INNER" },
-      { label: "Let SQL auto-detect shared column names", result: "NATURAL" },
-    ],
-  },
-  {
-    id: "q3",
     question: "Which table should keep ALL its rows (even unmatched)?",
     options: [
       { label: "The LEFT (first) table — it drives the result", result: "LEFT" },
       { label: "The RIGHT (second) table — keep all its rows", result: "RIGHT" },
-    ],
-  },
-  {
-    id: "q4",
-    question: "Which table's unmatched rows do you want?",
-    options: [
-      { label: "Rows only in the LEFT table (no match in right)", result: "LEFT_EX" },
-      { label: "Rows only in the RIGHT table (no match in left)", result: "RIGHT_EX" },
     ],
   },
 ];
@@ -328,9 +249,7 @@ export const decisionExplanations = {
   FULL:    "You need everything from both sides — FULL OUTER JOIN returns all rows, filling NULLs where matches don't exist.",
   CROSS:   "You need every combination — CROSS JOIN creates the Cartesian product (A × B rows). No join condition required.",
   SELF:    "The relationship is within the same table — SELF JOIN uses table aliases (A and B) to compare rows internally.",
-  NATURAL: "Both tables share a column name — NATURAL JOIN auto-detects and matches on it. No ON clause needed.",
-  LEFT_EX: "You want rows that exist ONLY in the left table with no match in the right. LEFT EXCLUSIVE = LEFT JOIN + WHERE right.key IS NULL.",
-  RIGHT_EX: "You want rows that exist ONLY in the right table with no match in the left. RIGHT EXCLUSIVE = RIGHT JOIN + WHERE left.key IS NULL.",
+
 };
 
 
@@ -426,5 +345,4 @@ export const cheatSheetItems = [
   { type: "FULL",    rule: "Keep everything",         icon: "🔄", color: "#f59e0b", mnemonic: "All rows, NULLs fill gaps" },
   { type: "CROSS",   rule: "All combos (A × B)",      icon: "✖️", color: "#8b5cf6", mnemonic: "Every row paired with every row" },
   { type: "SELF",    rule: "Table joins itself",      icon: "🪞", color: "#f43f5e", mnemonic: "Same table, different aliases" },
-  { type: "NATURAL", rule: "Auto-match columns",      icon: "🌿", color: "#14b8a6", mnemonic: "No ON clause needed" },
 ];

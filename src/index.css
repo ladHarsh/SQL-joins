@@ -162,24 +162,6 @@ body {
   border-color: rgba(244, 63, 94, .35);
 }
 
-.jbtn[data-type="NATURAL"] {
-  background: rgba(20, 184, 166, .12);
-  color: #14b8a6;
-  border-color: rgba(20, 184, 166, .35);
-}
-
-.jbtn[data-type="LEFT_EX"] {
-  background: rgba(16, 185, 129, .12);
-  color: #10b981;
-  border-color: rgba(16, 185, 129, .35);
-}
-
-.jbtn[data-type="RIGHT_EX"] {
-  background: rgba(249, 115, 22, .12);
-  color: #f97316;
-  border-color: rgba(249, 115, 22, .35);
-}
-
 .jbtn:hover,
 .jbtn.active {
   filter: brightness(1.25);
@@ -225,10 +207,6 @@ body {
   opacity: .35;
 }
 
-.drow.exclusive {
-  border: 1px solid rgba(16, 185, 129, .4);
-  background: rgba(16, 185, 129, .06);
-}
 
 /* ═══════════════ QUIZ ═══════════════ */
 .quiz-opt {

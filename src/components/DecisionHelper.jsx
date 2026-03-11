@@ -7,15 +7,12 @@ function MiniVenn({ type }) {
   const info = joinDescriptions[type];
   const c = info?.color || "#6366f1";
   const cfg = {
-    INNER:    { l: false, o: true,  r: false },
-    LEFT:     { l: true,  o: true,  r: false },
-    RIGHT:    { l: false, o: true,  r: true  },
-    FULL:     { l: true,  o: true,  r: true  },
-    LEFT_EX:  { l: true,  o: false, r: false },
-    RIGHT_EX: { l: false, o: false, r: true  },
-    CROSS:    { l: true,  o: true,  r: true  },
-    SELF:     { l: true,  o: true,  r: false },
-    NATURAL:  { l: false, o: true,  r: false },
+    INNER: { l: false, o: true,  r: false },
+    LEFT:  { l: true,  o: true,  r: false },
+    RIGHT: { l: false, o: true,  r: true  },
+    FULL:  { l: true,  o: true,  r: true  },
+    CROSS: { l: true,  o: true,  r: true  },
+    SELF:  { l: true,  o: true,  r: false },
   }[type] || {};
   return (
     <svg viewBox="0 0 120 80" className="w-20 mx-auto" xmlns="http://www.w3.org/2000/svg">
@@ -23,7 +20,6 @@ function MiniVenn({ type }) {
       <circle cx="43" cy="40" r="28" fill={cfg.l ? c : "transparent"} fillOpacity={cfg.l ? .35 : 0} stroke={c} strokeWidth="1.5" strokeOpacity=".4" />
       <circle cx="77" cy="40" r="28" fill={cfg.r ? c : "transparent"} fillOpacity={cfg.r ? .35 : 0} stroke={c} strokeWidth="1.5" strokeOpacity=".4" />
       <circle cx="77" cy="40" r="28" clipPath={`url(#mv-${type})`} fill={cfg.o ? c : "#0f172a"} fillOpacity={cfg.o ? .6 : .8} />
-      {type === "LEFT_EX" && <circle cx="77" cy="40" r="28" clipPath={`url(#mv-${type})`} fill="#0f172a" fillOpacity=".85" />}
     </svg>
   );
 }
