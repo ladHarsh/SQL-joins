@@ -6,7 +6,7 @@ function MiniDiagram({ ex }) {
   return (
     <div className="mt-3 rounded-xl overflow-hidden border border-slate-800/60">
       {/* Tables header */}
-      <div className="grid grid-cols-2 text-[.58rem] font-mono text-slate-600 uppercase tracking-wider px-3 py-1.5 border-b border-slate-800/60">
+      <div className="grid grid-cols-2 text-[.58rem] font-mono text-slate-400 uppercase tracking-wider px-3 py-1.5 border-b border-slate-800/60">
         <span>{ex.leftTable}</span>
         <span className="text-right">{ex.rightTable}</span>
       </div>
@@ -35,7 +35,7 @@ function MiniDiagram({ ex }) {
 
       {/* Result */}
       <div className="px-3 py-2">
-        <p className="text-[.55rem] font-mono text-slate-600 uppercase tracking-wider mb-1.5">Result →</p>
+        <p className="text-[.55rem] font-mono text-slate-400 uppercase tracking-wider mb-1.5">Result →</p>
         <div className="space-y-1">
           {ex.resultRows.map((r, i) => (
             <div key={i} className={`text-[.65rem] px-2 py-0.5 rounded-md font-mono ${
@@ -45,7 +45,7 @@ function MiniDiagram({ ex }) {
             }`}>{r}</div>
           ))}
         </div>
-        <p className="text-[.58rem] text-slate-600 mt-1.5 italic">{ex.resultType}</p>
+        <p className="text-[.58rem] text-slate-400 mt-1.5 italic">{ex.resultType}</p>
       </div>
     </div>
   );
@@ -117,10 +117,10 @@ export default function RealWorldExamples() {
           <table className="w-full text-xs min-w-[520px]">
             <thead>
               <tr className="border-b border-slate-800">
-                <th className="text-left py-2 px-3 text-slate-500 font-semibold">JOIN Type</th>
-                <th className="text-left py-2 px-3 text-slate-500 font-semibold">Returns</th>
-                <th className="text-left py-2 px-3 text-slate-500 font-semibold">NULLs?</th>
-                <th className="text-left py-2 px-3 text-slate-500 font-semibold">Condition</th>
+                <th className="text-left py-2 px-3 text-slate-300 font-semibold">JOIN Type</th>
+                <th className="text-left py-2 px-3 text-slate-300 font-semibold">Returns</th>
+                <th className="text-left py-2 px-3 text-slate-300 font-semibold">NULLs?</th>
+                <th className="text-left py-2 px-3 text-slate-300 font-semibold">Condition</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-800/50">
@@ -146,7 +146,7 @@ export default function RealWorldExamples() {
                         {row.nulls}
                       </span>
                     </td>
-                    <td className="py-2 px-3 text-slate-500 font-mono text-[.65rem]">{row.cond}</td>
+                    <td className="py-2 px-3 text-slate-400 font-mono text-[.65rem]">{row.cond}</td>
                   </tr>
                 );
               })}

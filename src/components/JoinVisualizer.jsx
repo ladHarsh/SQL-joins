@@ -83,15 +83,15 @@ function SQLResultTable({ result, tconf, info }) {
         <thead>
           <tr className="bg-slate-800/50">
             {lCols.map(c => (
-              <th key={`l-${c}`} className="px-3 py-2 text-left text-slate-400 font-semibold uppercase tracking-wider border-b border-slate-700/50">
+              <th key={`l-${c}`} className="px-3 py-2 text-left text-slate-200 font-semibold uppercase tracking-wider border-b border-slate-700/50">
                 r.{c.replace(/_/g, "")}
               </th>
             ))}
             <th className="px-1 py-2 border-b border-slate-700/50 w-4">
-              <span className="text-slate-600">│</span>
+              <span className="text-slate-500">│</span>
             </th>
             {rCols.map(c => (
-              <th key={`r-${c}`} className="px-3 py-2 text-left text-slate-400 font-semibold uppercase tracking-wider border-b border-slate-700/50">
+              <th key={`r-${c}`} className="px-3 py-2 text-left text-slate-200 font-semibold uppercase tracking-wider border-b border-slate-700/50">
                 s.{c.replace(/_/g, "")}
               </th>
             ))}
@@ -237,7 +237,7 @@ export default function JoinVisualizer() {
               <span className="font-['Outfit'] font-bold text-sm text-white">{tconf.leftName}</span>
               <span className="ml-auto text-[.6rem] font-mono text-slate-500 uppercase tracking-wider">LEFT TABLE</span>
             </div>
-            <div className="flex gap-2 px-3 py-1 text-[.58rem] font-mono text-slate-600 uppercase tracking-wider border-b border-slate-800/60 mb-1">
+            <div className="flex gap-2 px-3 py-1 text-[.58rem] font-mono text-slate-300 uppercase tracking-wider border-b border-slate-800/60 mb-1">
               <span className="w-7">PK</span>
               {tconf.lFields.map(f => (
                 <span key={f} className={`${f === 'role' ? 'flex-[2]' : 'flex-1'} truncate text-left`}>
@@ -275,7 +275,7 @@ export default function JoinVisualizer() {
               <span className="font-['Outfit'] font-bold text-sm text-white">{tconf.rightName}</span>
               <span className="ml-auto text-[.6rem] font-mono text-slate-500 uppercase tracking-wider">RIGHT TABLE</span>
             </div>
-            <div className="flex gap-2 px-3 py-1 text-[.58rem] font-mono text-slate-600 uppercase tracking-wider border-b border-slate-800/60 mb-1">
+            <div className="flex gap-2 px-3 py-1 text-[.58rem] font-mono text-slate-300 uppercase tracking-wider border-b border-slate-800/60 mb-1">
               <span className="w-7">FK</span>
               {tconf.rFields.map(f => <span key={f} className="flex-1 truncate">{f.replace(/_/g, " ")}</span>)}
             </div>

@@ -140,7 +140,7 @@ export default function DecisionHelper() {
               </div>
 
               <div className="glass p-4 rounded-xl text-left mb-4">
-                <p className="text-[.6rem] font-mono text-slate-600 uppercase tracking-wider mb-2">SQL Pattern</p>
+                <p className="text-[.6rem] font-mono text-slate-400 uppercase tracking-wider mb-2">SQL Pattern</p>
                 <pre className="bg-[#020617] rounded-lg p-3 text-[.68rem] font-mono text-cyan-300 overflow-x-auto leading-relaxed whitespace-pre-wrap">
                   {resultInfo.sql}
                 </pre>

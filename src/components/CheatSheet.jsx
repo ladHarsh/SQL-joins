@@ -83,7 +83,7 @@ export default function CheatSheet() {
                 {/* Mini diagram */}
                 <div className="flex gap-2 mb-3">
                   <div className="flex-1">
-                    <p className="text-[.55rem] text-slate-500 font-mono uppercase mb-1">{ex.leftTable}</p>
+                    <p className="text-[.55rem] text-slate-300 font-mono uppercase mb-1">{ex.leftTable}</p>
                     <div className="space-y-1">
                       {ex.diagram.left.map((item, j) => {
                         const isMatched = ex.diagram.matched === "all" || ex.diagram.matched?.some(m => m[0] === item);
@@ -102,7 +102,7 @@ export default function CheatSheet() {
                   </div>
                   <div className="flex items-center text-slate-600 text-xs">⟷</div>
                   <div className="flex-1">
-                    <p className="text-[.55rem] text-slate-500 font-mono uppercase mb-1">{ex.rightTable}</p>
+                    <p className="text-[.55rem] text-slate-300 font-mono uppercase mb-1">{ex.rightTable}</p>
                     <div className="space-y-1">
                       {ex.diagram.right.map((item, j) => {
                         const isMatched = ex.diagram.matched === "all" || ex.diagram.matched?.some(m => m[1] === item);
